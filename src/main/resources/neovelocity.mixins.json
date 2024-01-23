@@ -4,6 +4,9 @@
   "package": "dev.gabwasnt.neovelocity.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ConnectionAccessor",
+    "ServerboundCustomQueryAnswerPacketMixin",
+    "ServerHandshakePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1
