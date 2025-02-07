@@ -1,8 +1,8 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "dev.gabwasnt.neovelocity.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "package": "dev.g_ab.neovelocity.mixin",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ConnectionAccessor",
     "ServerboundCustomQueryAnswerPacketMixin",

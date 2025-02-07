@@ -1,7 +1,7 @@
-package dev.gabwasnt.neovelocity.mixin;
+package dev.g_ab.neovelocity.mixin;
 
-import dev.gabwasnt.neovelocity.QueryAnswerPayload;
-import dev.gabwasnt.neovelocity.NeoVelocityConfig;
+import dev.g_ab.neovelocity.NeoVelocityConfig;
+import dev.g_ab.neovelocity.VelocityProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
 import net.minecraft.network.protocol.login.custom.CustomQueryAnswerPayload;
@@ -14,11 +14,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerboundCustomQueryAnswerPacket.class)
 public class ServerboundCustomQueryAnswerPacketMixin {
-    @Shadow @Final private static int MAX_PAYLOAD_SIZE;
+    @Shadow
+    @Final
+    private static int MAX_PAYLOAD_SIZE;
 
     @Inject(method = "readPayload", at = @At("HEAD"), cancellable = true)
     private static void readPayload(int pTransactionId, FriendlyByteBuf pBuffer, CallbackInfoReturnable<CustomQueryAnswerPayload> cir) {
-        if (!NeoVelocityConfig.Server.ENABLED.get()) return;
+        if (!NeoVelocityConfig.COMMON.ENABLED.get()) return;
         FriendlyByteBuf buffer = pBuffer.readNullable((buf2) -> {
             int i = buf2.readableBytes();
             if (i >= 0 && i <= MAX_PAYLOAD_SIZE) {
@@ -27,6 +29,7 @@ public class ServerboundCustomQueryAnswerPacketMixin {
                 throw new IllegalArgumentException("Payload may not be larger than " + MAX_PAYLOAD_SIZE + " bytes");
             }
         });
-        cir.setReturnValue(buffer == null ? null : new QueryAnswerPayload(buffer));
+        cir.setReturnValue(buffer == null ? null : new VelocityProxy.QueryAnswerPayload(buffer));
+        cir.cancel();
     }
 }
