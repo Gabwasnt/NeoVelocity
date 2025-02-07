@@ -176,9 +176,9 @@ tasks.withType<ProcessResources>().configureEach {
     }
 }
 
-val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/ProjectArmadeus/ArmaBellum"
+val PACKAGES_URL = System.getenv("GH_PKG_URL") ?: "https://maven.pkg.github.com/Gabwasnt/NeoVelocity"
 publishing {
-    publications.register<MavenPublication>("Armabellum") {
+    publications.register<MavenPublication>("NeoVelocity") {
         artifactId = "$modId-neoforge"
         from(components.getByName("java"))
     }
