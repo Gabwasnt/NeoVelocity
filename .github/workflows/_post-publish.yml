@@ -45,7 +45,7 @@ jobs:
             fi
 
             # Insert the new release **right after** the Unreleased section
-            new_release_section="## [${version}](https://github.com/Gabwasnt/NeoVelocity/compare/dev...${version}) - ${release_date}"
+            new_release_section="## [${version}](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v${version}) - ${release_date}"
 
             # Add the release notes by shifting lines down
             sed -i.bak "${unreleased_line}a\\
@@ -66,7 +66,7 @@ jobs:
 
       - name: Create Git Tag
         run: |
-            git tag ${{ inputs.version }}
-            git push origin ${{ inputs.version }}
+            git tag v${{ inputs.version }}
+            git push origin v${{ inputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
