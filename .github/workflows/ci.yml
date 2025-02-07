@@ -56,15 +56,8 @@ jobs:
           search_commit_body: true
           bump_each_commit: true
 
-  datagen:
-    needs: [ variables ]
-    uses: ./.github/workflows/_datagen.yml
-    secrets: inherit
-    with:
-      version: ${{ needs.variables.outputs.version }}
-
   publish:
-    needs: [ variables, datagen ]
+    needs: [ variables ]
     uses: ./.github/workflows/_publish.yml
     secrets: inherit
     with:
