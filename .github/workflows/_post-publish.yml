@@ -1,0 +1,54 @@
+name: Post Publish
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  post-publish:
+    name: Update Changelog and Gradle vars - ${{ inputs.version }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Current Date
+        run: echo "date=$(date '+%Y.%m.%d')" >> $GITHUB_ENV
+
+      - name: Update changelog
+        id: update-changelog
+        run: |
+            version=${{ github.event.inputs.version }}
+            changelog_file="CHANGELOG.md"
+
+            if [ ! -f "$changelog_file" ]; then
+                echo "Changelog file not found: $changelog_file"
+                exit 1
+            fi
+
+            # Generate current date in ISO 8601 format
+            release_date=$(date +%Y-%m-%d)
+
+            # Replace [Unreleased] with the new version
+            sed -i.bak -E "s/## \[Unreleased\]/## [${version}] - ${release_date}/" "$changelog_file"
+
+            # Add a new Unreleased section at the top
+            unreleased_section="## [Unreleased]\n\n### Added\n\n- Placeholder for new features.\n\n"
+            sed -i.bak "2i\\
+            ${unreleased_section}" "$changelog_file"
+
+            # Remove the backup file created by sed
+            rm -f "$changelog_file.bak"
+
+      - name: Update mod_version in gradle.properties
+        run: |
+          sed -i "s/^mod_version=.*/mod_version=${{ inputs.version }}/" gradle.properties
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}

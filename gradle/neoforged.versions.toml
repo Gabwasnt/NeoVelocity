@@ -1,0 +1,13 @@
+[versions]
+neoforge = "21.1.97"
+mdg = "2.0.71"
+neoforgeRange = { require = "[21.1.97,)", prefer = "21.1.97" }
+loaderRange = { require = "[4,)", prefer = "4" }
+
+[libraries.testframework]
+module = "net.neoforged:testframework"
+version.ref = "neoforge"
+
+[plugins.moddev]
+id = "net.neoforged.moddev"
+version.ref = "mdg"

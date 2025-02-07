@@ -1,11 +1,14 @@
-package dev.gabwasnt.neovelocity;
+package dev.g_ab.neovelocity;
 
 import com.google.common.net.InetAddresses;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.login.custom.CustomQueryAnswerPayload;
+import net.minecraft.network.protocol.login.custom.CustomQueryPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.ProfilePublicKey;
+import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -14,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.UUID;
 
 public class VelocityProxy {
@@ -23,7 +25,7 @@ public class VelocityProxy {
     public static final int MODERN_FORWARDING_WITH_KEY_V2 = 3;
     public static final int MODERN_LAZY_SESSION = 4;
     public static final byte MAX_SUPPORTED_FORWARDING_VERSION = SUPPORTED_FORWARDING_VERSION;
-    public static final ResourceLocation PLAYER_INFO_CHANNEL = new ResourceLocation("velocity", "player_info");
+    public static final ResourceLocation PLAYER_INFO_CHANNEL = ResourceLocation.fromNamespaceAndPath("velocity", "player_info");
 
     public static boolean checkIntegrity(final FriendlyByteBuf buf) {
         final byte[] signature = new byte[32];
@@ -34,7 +36,7 @@ public class VelocityProxy {
 
         try {
             final Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(NeoVelocityConfig.Server.SECRET.get().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            mac.init(new SecretKeySpec(NeoVelocityConfig.COMMON.SECRET.get().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
             final byte[] mySignature = mac.doFinal(data);
 
             if (!MessageDigest.isEqual(signature, mySignature)) {
@@ -73,5 +75,26 @@ public class VelocityProxy {
 
     public static UUID readSignerUuidOrElse(FriendlyByteBuf buf, UUID orElse) {
         return buf.readBoolean() ? buf.readUUID() : orElse;
+    }
+
+    public record QueryAnswerPayload(FriendlyByteBuf buffer) implements CustomQueryAnswerPayload {
+        @Override
+        public void write(final FriendlyByteBuf buf) {
+        }
+    }
+
+    public record VersionPayload(byte version) implements CustomQueryPayload {
+
+        public static final ResourceLocation id = PLAYER_INFO_CHANNEL;
+
+        @Override
+        public void write(final FriendlyByteBuf buf) {
+            buf.writeByte(this.version);
+        }
+
+        @Override
+        public @NotNull ResourceLocation id() {
+            return id;
+        }
     }
 }
