@@ -21,26 +21,37 @@ jobs:
       - name: Update changelog
         id: update-changelog
         run: |
-            version=${{ github.event.inputs.version }}
+            # Set variables
+            version="${{ inputs.version }}"
             changelog_file="CHANGELOG.md"
 
             if [ ! -f "$changelog_file" ]; then
-                echo "Changelog file not found: $changelog_file"
-                exit 1
+              echo "Changelog file not found: $changelog_file"
+              exit 1
             fi
 
-            # Generate current date in ISO 8601 format
+            # Get current release date in ISO 8601 format
             release_date=$(date +%Y-%m-%d)
 
-            # Replace [Unreleased] with the new version
-            sed -i.bak -E "s/## \[Unreleased\]/## [${version}] - ${release_date}/" "$changelog_file"
+            # Ensure [Unreleased] section always has the correct compare link
+            sed -i.bak -E 's|^(## \[Unreleased\]).*|\1 \(https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD\)|' "$changelog_file"
 
-            # Add a new Unreleased section at the top
-            unreleased_section="## [Unreleased]\n\n### Added\n\n- Placeholder for new features.\n\n"
-            sed -i.bak "2i\\
-            ${unreleased_section}" "$changelog_file"
+            # Find line number of the Unreleased section
+            unreleased_line=$(grep -n "^## \[Unreleased\]" "$changelog_file" | cut -d: -f1)
 
-            # Remove the backup file created by sed
+            if [ -z "$unreleased_line" ]; then
+              echo "Unreleased section not found!"
+              exit 1
+            fi
+
+            # Insert the new release **right after** the Unreleased section
+            new_release_section="## [${version}](https://github.com/Gabwasnt/NeoVelocity/compare/dev...${version}) - ${release_date}"
+
+            # Add the release notes by shifting lines down
+            sed -i.bak "${unreleased_line}a\\
+            \\n${new_release_section}\\n" "$changelog_file"
+
+            # Clean up backup file
             rm -f "$changelog_file.bak"
 
       - name: Update mod_version in gradle.properties
@@ -52,3 +63,10 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref_name }}
+
+      - name: Create Git Tag
+        run: |
+            git tag ${{ inputs.version }}
+            git push origin ${{ inputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
