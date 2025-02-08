@@ -7,8 +7,6 @@ import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-// An gabwasnt config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Forge's config APIs
 public class NeoVelocityConfig {
     public static final NeoVelocityConfig.Common COMMON;
     static final ModConfigSpec commonSpec;
@@ -21,11 +19,11 @@ public class NeoVelocityConfig {
     }
 
     public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        //VelocityConfig.getLogger().debug("Loaded Armadeus config file {}", configEvent.getConfig().getFileName());
+        NeoVelocity.getLogger().debug("NeoVelocity is {}", COMMON.ENABLED.get() ? "enabled" : "disabled");
     }
 
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-        //VelocityConfig.getLogger().debug("Armadeus config just got changed on the file system!");
+        NeoVelocity.getLogger().debug("NeoVelocity was {}", COMMON.ENABLED.get() ? "enabled" : "disabled");
     }
 
     public static class Common {

@@ -17,7 +17,6 @@ public class NeoVelocity {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public NeoVelocity(IEventBus bus, ModContainer mod) {
-        NeoForge.EVENT_BUS.register(this);
         NeoVelocityConfig.register(bus, mod);
     }
 
@@ -27,10 +26,5 @@ public class NeoVelocity {
 
     public static Logger getLogger() {
         return LOGGER;
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("NeoVelocity Active!");
     }
 }
