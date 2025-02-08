@@ -28,27 +28,8 @@ jobs:
 
             -   name: Set up Maven settings for GitHub Packages
                 run: |
-                    cat > settings.xml <<EOF
-                    <settings>
-                     <servers>
-                      <server>
-                       <id>github</id>
-                       <username>${{ github.actor }}</username>
-                       <password>${{ secrets.GITHUB_TOKEN }}</password>
-                      </server>
-                     </servers>
-                    </settings>
-                    EOF
-
-            -   name: Download JAR from GitHub Packages
-                run: |
-                    mkdir -p downloaded
-                    mvn dependency:copy \
-                        -Dartifact=com.github.${{ github.actor }}.${{ github.repository_owner }}:${{ github.event.repository.name }}-neoforge:${{ inputs.version }}:jar \
-                        -DoutputDirectory=downloaded \
-                        -s settings.xml \
-                        -DrepoUrl=${{ env.GH_PKG_URL }} \
-                        -DserverId=github
+                    curl -u "${{ secrets.GITHUB_ACTOR }}:${{ secrets.GITHUB_TOKEN }}" -L -o neovelocity-neoforge-${{ inputs.version }}.jar \
+                    "${{GH_PKG_URL}}/dev/g_ab/neovelocity/neovelocity-neoforge/${{ inputs.version }}/neovelocity-neoforge-${{ inputs.version }}.jar"
 
             -   name: List downloaded files
                 run: ls -la downloaded
@@ -70,5 +51,5 @@ jobs:
                     version: ${{ inputs.version }}
                     changelog-file: RELEASE_CHANGELOG.md
                     files: |
-                        downloaded/*.jar
+                        *.jar
                     loaders: neoforge
