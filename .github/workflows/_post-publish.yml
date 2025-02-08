@@ -1,72 +1,72 @@
 name: Post Publish
 
 on:
-  workflow_call:
-    inputs:
-      version:
-        required: true
-        type: string
+    workflow_call:
+        inputs:
+            version:
+                required: true
+                type: string
 
 jobs:
-  post-publish:
-    name: Update Changelog and Gradle vars - ${{ inputs.version }}
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    post-publish:
+        name: Update Changelog and Gradle vars - ${{ inputs.version }}
+        runs-on: ubuntu-22.04
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
 
-      - name: Get Current Date
-        run: echo "date=$(date '+%Y.%m.%d')" >> $GITHUB_ENV
+            -   name: Get Current Date
+                run: echo "date=$(date '+%Y.%m.%d')" >> $GITHUB_ENV
 
-      - name: Update changelog
-        id: update-changelog
-        run: |
-            # Set variables
-            version="${{ inputs.version }}"
-            changelog_file="CHANGELOG.md"
+            -   name: Update changelog
+                id: update-changelog
+                run: |
+                    # Set variables
+                    version="${{ inputs.version }}"
+                    changelog_file="CHANGELOG.md"
 
-            if [ ! -f "$changelog_file" ]; then
-              echo "Changelog file not found: $changelog_file"
-              exit 1
-            fi
+                    if [ ! -f "$changelog_file" ]; then
+                      echo "Changelog file not found: $changelog_file"
+                      exit 1
+                    fi
 
-            # Get current release date in ISO 8601 format
-            release_date=$(date +%Y-%m-%d)
+                    # Get current release date in ISO 8601 format
+                    release_date=$(date +%Y-%m-%d)
 
-            # Ensure [Unreleased] section always has the correct compare link
-            sed -i.bak -E 's|^(## \[Unreleased\]).*|\1\(https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD\)|' "$changelog_file"
+                    # Ensure [Unreleased] section always has the correct compare link
+                    sed -i.bak -E 's|^(## \[Unreleased\]).*|\1\(https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD\)|' "$changelog_file"
 
-            # Find line number of the Unreleased section
-            unreleased_line=$(grep -n "^## \[Unreleased\]" "$changelog_file" | cut -d: -f1)
+                    # Find line number of the Unreleased section
+                    unreleased_line=$(grep -n "^## \[Unreleased\]" "$changelog_file" | cut -d: -f1)
 
-            if [ -z "$unreleased_line" ]; then
-              echo "Unreleased section not found!"
-              exit 1
-            fi
+                    if [ -z "$unreleased_line" ]; then
+                      echo "Unreleased section not found!"
+                      exit 1
+                    fi
 
-            # Insert the new release **right after** the Unreleased section
-            new_release_section="## [${version}](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v${version}) - ${release_date}"
+                    # Insert the new release **right after** the Unreleased section
+                    new_release_section="## [${version}](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v${version}) - ${release_date}"
 
-            # Add the release notes by shifting lines down
-            sed -i.bak "${unreleased_line}a\\
-            \\n${new_release_section}" "$changelog_file"
+                    # Add the release notes by shifting lines down
+                    sed -i.bak "${unreleased_line}a\\
+                    \\n${new_release_section}" "$changelog_file"
 
-            # Clean up backup file
-            rm -f "$changelog_file.bak"
+                    # Clean up backup file
+                    rm -f "$changelog_file.bak"
 
-      - name: Update mod_version in gradle.properties
-        run: |
-          sed -i "s/^mod_version=.*/mod_version=${{ inputs.version }}/" gradle.properties
+            -   name: Update mod_version in gradle.properties
+                run: |
+                    sed -i "s/^mod_version=.*/mod_version=${{ inputs.version }}/" gradle.properties
 
-      - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref_name }}
+            -   name: Commit & Push changes
+                uses: actions-js/push@master
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    branch: ${{ github.ref_name }}
 
-      - name: Create Git Tag
-        run: |
-            git tag v${{ inputs.version }}
-            git push origin v${{ inputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            -   name: Create Git Tag
+                run: |
+                    git tag v${{ inputs.version }}
+                    git push origin v${{ inputs.version }}
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

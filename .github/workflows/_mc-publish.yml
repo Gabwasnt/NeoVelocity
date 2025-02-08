@@ -1,0 +1,65 @@
+name: Publish
+
+on:
+    workflow_call:
+        inputs:
+            version:
+                required: true
+                type: string
+
+jobs:
+    publish:
+        name: Publish Mod to Modrinth - ${{ inputs.version }}
+        runs-on: ubuntu-22.04
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+                with:
+                    submodules: true
+
+            -   name: Set up Maven settings for GitHub Packages
+                run: |
+                    cat > settings.xml <<EOF
+                    <settings>
+                     <servers>
+                      <server>
+                       <id>github</id>
+                       <username>${{ github.actor }}</username>
+                       <password>${{ secrets.GITHUB_TOKEN }}</password>
+                      </server>
+                     </servers>
+                    </settings>
+                    EOF
+
+            -   name: Download JAR from GitHub Packages
+                run: |
+                    mkdir -p downloaded
+                    mvn dependency:copy \
+                        -Dartifact=com.github.Gabwasnt.NeoVelocity:NeoVelocity-neoforge:${{ inputs.version }}:jar \
+                        -DoutputDirectory=downloaded \
+                        -s settings.xml \
+                        -DrepoUrl=https://maven.pkg.github.com/Gabwasnt/NeoVelocity \
+                        -DserverId=github
+
+            -   name: List downloaded files
+                run: ls -la downloaded
+
+            -   name: Parse changelog
+                id: parse-changelog
+                run: |
+                    changelog=$(cat CHANGELOG.md)
+                    list=$(echo "$changelog" | sed -n "/^## \[${{ github.event.release.tag_name }}\]/,/^## \[[0-9]\+\.[0-9]\+\.[0-9a-zA-Z]\+\]/p" | sed -e '1d;$d')
+                    echo "$list" > RELEASE_CHANGELOG.md
+
+            -   name: Publish to Modrinth
+                uses: Kir-Antipov/mc-publish@v3.3
+                with:
+                    modrinth-id: RT18TcxA
+                    modrinth-featured: true
+                    modrinth-unfeature-mode: subset
+                    modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+                    version: ${{ inputs.version }}
+                    changelog-file: RELEASE_CHANGELOG.md
+                    files: |
+                        downloaded/*.jar
+                    loaders: neoforge
