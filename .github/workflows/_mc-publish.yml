@@ -28,9 +28,6 @@ jobs:
                     curl -u "${{ secrets.GITHUB_ACTOR }}:${{ secrets.GITHUB_TOKEN }}" -L -o neovelocity-neoforge-${{ inputs.version }}.jar \
                     "https://maven.pkg.github.com/${{ github.repository }}/dev/g_ab/neovelocity/neovelocity-neoforge/${{ inputs.version }}/neovelocity-neoforge-${{ inputs.version }}.jar"
 
-            -   name: List downloaded files
-                run: ls -la downloaded
-
             -   name: Parse changelog
                 id: parse-changelog
                 run: |
