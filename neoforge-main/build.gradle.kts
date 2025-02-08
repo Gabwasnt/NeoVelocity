@@ -136,16 +136,18 @@ tasks.withType<Jar> {
         commandLine("git", "rev-parse", "HEAD")
     }.standardOutput.asText.get()
 
+    from(rootDir.resolve("LICENSE"))
+
     manifest {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(
             mapOf(
-                "Specification-Title" to "ArmadeusCore",
-                "Specification-Vendor" to "ArmadeusDevTeam",
-                "Specification-Version" to "2",
-                "Implementation-Title" to "ArmadeusCore",
+                "Specification-Title" to "G_ab/Gabwasnt",
+                "Specification-Vendor" to "G_ab/Gabwasnt",
+                "Specification-Version" to "1",
+                "Implementation-Title" to "G_ab/Gabwasnt",
                 "Implementation-Version" to archiveVersion,
-                "Implementation-Vendor" to "ArmadeusDevTeam",
+                "Implementation-Vendor" to "G_ab/Gabwasnt",
                 "Implementation-Timestamp" to now,
                 "Minecraft-Version" to mojang.versions.minecraft.get(),
                 "NeoForge-Version" to neoforged.versions.neoforge.get(),
