@@ -7,12 +7,6 @@ env:
 
 on:
     workflow_dispatch:
-        inputs:
-            skip_tests:
-                description: Skip Tests
-                type: boolean
-                default: false
-                required: true
     push:
         branches:
             - main
@@ -59,6 +53,13 @@ jobs:
     publish:
         needs: [ variables ]
         uses: ./.github/workflows/_publish.yml
+        secrets: inherit
+        with:
+            version: ${{ needs.variables.outputs.version }}
+
+    mc-publish:
+        needs: [ publish ]
+        uses: ./.github/workflows/_mc-publish.yml
         secrets: inherit
         with:
             version: ${{ needs.variables.outputs.version }}

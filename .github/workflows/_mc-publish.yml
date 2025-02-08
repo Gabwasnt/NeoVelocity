@@ -1,10 +1,19 @@
 name: Publish
 
+env:
+    GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
+
 on:
     workflow_call:
         inputs:
             version:
                 required: true
+                type: string
+    workflow_dispatch:
+        inputs:
+            version:
+                required: true
+                description: Version String
                 type: string
 
 jobs:
@@ -35,10 +44,10 @@ jobs:
                 run: |
                     mkdir -p downloaded
                     mvn dependency:copy \
-                        -Dartifact=com.github.Gabwasnt.NeoVelocity:NeoVelocity-neoforge:${{ inputs.version }}:jar \
+                        -Dartifact=com.github.${{ github.actor }}.${{ github.repository_owner }}:${{ github.event.repository.name }}-neoforge:${{ inputs.version }}:jar \
                         -DoutputDirectory=downloaded \
                         -s settings.xml \
-                        -DrepoUrl=https://maven.pkg.github.com/Gabwasnt/NeoVelocity \
+                        -DrepoUrl=${{ env.GH_PKG_URL }} \
                         -DserverId=github
 
             -   name: List downloaded files
