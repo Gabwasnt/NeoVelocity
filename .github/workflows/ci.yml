@@ -2,70 +2,68 @@ name: Continuous Integration
 
 ## check out https://github.com/CompactMods/CompactMachines kinda yoiked a bit...
 
-env:
-  GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
-
 on:
-  workflow_dispatch:
-    inputs:
-      skip_tests:
-        description: Skip Tests
-        type: boolean
-        default: false
-        required: true
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "README.md"
-      - "LICENSE"
-      - "CHANGELOG.md"
-      - "RELEASE_CHANGELOG.md"
-      - "**/.gitignore"
-      - "**/.gitattributes"
-      - "**/.editorconfig"
-      - "gradlew"
-      - "gradlew.bat"
-      - ".github/**/*"
-      - "**/*.gradle.kts"
-      - "**/gradle.properties"
-      - "gradle/**/*"
-      - "neoforge-test/**/*"
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+        paths-ignore:
+            - "README.md"
+            - "LICENSE"
+            - "CHANGELOG.md"
+            - "RELEASE_CHANGELOG.md"
+            - "**/.gitignore"
+            - "**/.gitattributes"
+            - "**/.editorconfig"
+            - "gradlew"
+            - "gradlew.bat"
+            - ".github/**/*"
+            - "**/*.gradle.kts"
+            - "**/gradle.properties"
+            - "gradle/**/*"
+            - "neoforge-test/**/*"
 
 jobs:
-  variables:
-    name: Get Variables
-    runs-on: ubuntu-22.04
-    outputs:
-      version: ${{steps.version.outputs.version}}
+    variables:
+        name: Get Variables
+        runs-on: ubuntu-22.04
+        outputs:
+            version: ${{steps.version.outputs.version}}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 150
+                    fetch-tags: true
+
+            -   name: Version
+                id: version
+                uses: paulhatch/semantic-version@v5.4.0
+                with:
+                    debug: true
+                    change_path: "neoforge-main"
+                    version_format: "${major}.${minor}.${patch}"
+                    search_commit_body: true
+                    bump_each_commit: true
+
+    publish:
+        needs: [ variables ]
+        uses: ./.github/workflows/_publish.yml
+        secrets: inherit
         with:
-          fetch-depth: 150
-          fetch-tags: true
+            version: ${{ needs.variables.outputs.version }}
 
-      - name: Version
-        id: version
-        uses: paulhatch/semantic-version@v5.4.0
+    mc-publish:
+        needs: [ publish ]
+        uses: ./.github/workflows/_mc-publish.yml
+        secrets: inherit
         with:
-          debug: true
-          change_path: "neoforge-main"
-          version_format: "${major}.${minor}.${patch}"
-          search_commit_body: true
-          bump_each_commit: true
+            version: ${{ needs.variables.outputs.version }}
 
-  publish:
-    needs: [ variables ]
-    uses: ./.github/workflows/_publish.yml
-    secrets: inherit
-    with:
-      version: ${{ needs.variables.outputs.version }}
-
-  post-publish:
-    needs: [ variables, publish ]
-    uses: ./.github/workflows/_post-publish.yml
-    secrets: inherit
-    with:
-      version: ${{ needs.variables.outputs.version }}
+    post-publish:
+        needs: [ variables, publish ]
+        uses: ./.github/workflows/_post-publish.yml
+        secrets: inherit
+        with:
+            version: ${{ needs.variables.outputs.version }}
