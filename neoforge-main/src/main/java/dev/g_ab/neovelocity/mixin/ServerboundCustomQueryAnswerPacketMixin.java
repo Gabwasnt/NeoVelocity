@@ -20,7 +20,6 @@ public class ServerboundCustomQueryAnswerPacketMixin {
 
     @Inject(method = "readPayload", at = @At("HEAD"), cancellable = true)
     private static void readPayload(int pTransactionId, FriendlyByteBuf pBuffer, CallbackInfoReturnable<CustomQueryAnswerPayload> cir) {
-        if (!NeoVelocityConfig.COMMON.ENABLED.get()) return;
         FriendlyByteBuf buffer = pBuffer.readNullable((buf2) -> {
             int i = buf2.readableBytes();
             if (i >= 0 && i <= MAX_PAYLOAD_SIZE) {

@@ -18,23 +18,15 @@ public class NeoVelocityConfig {
         COMMON = specPair.getLeft();
     }
 
-    public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        NeoVelocity.getLogger().debug("NeoVelocity is {}", COMMON.ENABLED.get() ? "enabled" : "disabled");
-    }
-
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-        NeoVelocity.getLogger().debug("NeoVelocity was {}", COMMON.ENABLED.get() ? "enabled" : "disabled");
+        NeoVelocity.getLogger().debug("Detected new secret!");
     }
 
     public static class Common {
-        public ModConfigSpec.ConfigValue<Boolean> ENABLED;
         public ModConfigSpec.ConfigValue<String> SECRET;
 
         Common(ModConfigSpec.Builder builder) {
             builder.comment("Configure the NeoVelocity Server mod");
-            ENABLED = builder
-                .comment("If the mod is enabled or not")
-                .define("enabled", false);
             SECRET = builder
                 .comment("The Forwarding secret of your velocity proxy")
                 .define("forwarding-secret", "secret!");
@@ -42,7 +34,6 @@ public class NeoVelocityConfig {
     }
 
     public static void register(IEventBus bus, ModContainer mod) {
-        bus.addListener(NeoVelocityConfig::onLoad);
         bus.addListener(NeoVelocityConfig::onFileChange);
         mod.registerConfig(ModConfig.Type.COMMON, NeoVelocityConfig.commonSpec);
     }
