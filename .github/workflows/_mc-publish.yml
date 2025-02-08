@@ -29,13 +29,19 @@ jobs:
                     "https://maven.pkg.github.com/${{ github.repository }}/dev/g_ab/neovelocity/neovelocity-neoforge/${{ inputs.version }}/neovelocity-neoforge-${{ inputs.version }}.jar"
 
             -   name: Parse changelog
-                id: parse-changelog
                 run: |
+                    # Getting the changelog
                     changelog=$(cat CHANGELOG.md)
+
+                    # Parsing it
                     list=$(echo "$changelog" | sed -n "/^## \[${{ github.event.release.tag_name }}](.*)/,/^## \[[0-9]\+\.[0-9]\+\.[0-9a-zA-Z]\+](.*)/p" | sed -e '1d;$d')
+
+                    # Setting it to new file
                     echo "$list" > RELEASE_CHANGELOG.md
+
+                    # Lil debug
                     cat RELEASE_CHANGELOG.md
-                    
+
             -   name: Publish to Modrinth
                 uses: Kir-Antipov/mc-publish@v3.3
                 with:
