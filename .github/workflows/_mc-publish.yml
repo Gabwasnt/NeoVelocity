@@ -17,7 +17,7 @@ on:
                 type: string
 
 jobs:
-    publish:
+    mc-publish:
         name: Publish Mod to Modrinth - ${{ inputs.version }}
         runs-on: ubuntu-22.04
         steps:
