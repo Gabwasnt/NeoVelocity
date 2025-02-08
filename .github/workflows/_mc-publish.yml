@@ -1,8 +1,5 @@
 name: MC-Publish
 
-env:
-    GH_PKG_URL: "https://maven.pkg.github.com/${{ github.repository }}"
-
 on:
     workflow_call:
         inputs:
@@ -29,7 +26,7 @@ jobs:
             -   name: Set up Maven settings for GitHub Packages
                 run: |
                     curl -u "${{ secrets.GITHUB_ACTOR }}:${{ secrets.GITHUB_TOKEN }}" -L -o neovelocity-neoforge-${{ inputs.version }}.jar \
-                    "${{GH_PKG_URL}}/dev/g_ab/neovelocity/neovelocity-neoforge/${{ inputs.version }}/neovelocity-neoforge-${{ inputs.version }}.jar"
+                    "https://maven.pkg.github.com/${{ github.repository }}/dev/g_ab/neovelocity/neovelocity-neoforge/${{ inputs.version }}/neovelocity-neoforge-${{ inputs.version }}.jar"
 
             -   name: List downloaded files
                 run: ls -la downloaded
