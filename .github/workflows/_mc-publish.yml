@@ -34,6 +34,7 @@ jobs:
                     changelog=$(cat CHANGELOG.md)
                     list=$(echo "$changelog" | sed -n "/^## \[${{ github.event.release.tag_name }}](.*)/,/^## \[[0-9]\+\.[0-9]\+\.[0-9a-zA-Z]\+](.*)/p" | sed -e '1d;$d')
                     echo "$list" > RELEASE_CHANGELOG.md
+                    cat RELEASE_CHANGELOG.md
                     
             -   name: Publish to Modrinth
                 uses: Kir-Antipov/mc-publish@v3.3
