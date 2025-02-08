@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
+## [1.0.2](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.0.2) - 2025-02-08
+
 + Fixed post-publish formatting the changelog file wrongly 
 
 ## [1.0.1](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.0.1) - 2025-02-07
