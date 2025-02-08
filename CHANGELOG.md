@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
+## [1.0.0](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.0.0) - 2025-02-08
+
 + Library Setup
 + CI/CD action
 + Velocity proxy protocol compatibility layer
