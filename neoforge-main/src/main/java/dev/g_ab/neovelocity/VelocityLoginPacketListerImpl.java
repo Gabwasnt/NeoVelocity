@@ -51,7 +51,7 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
 
             FriendlyByteBuf buf = payload.buffer();
             if (!VelocityProxy.checkIntegrity(buf)) {
-                this.disconnect(Component.literal("Unable to verify player details"));
+                this.disconnect(Component.literal("Unable to verify player details."));
                 NeoVelocity.getLogger().warn("Someone/{} is trying to login with invalid secrets! Make sure ports are not exposed or that your secrets are corrects on both sides!", this.connection.getRemoteAddress());
                 return;
             }
