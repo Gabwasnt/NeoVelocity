@@ -55,7 +55,7 @@ jobs:
             version: ${{ needs.variables.outputs.version }}
 
     mc-publish:
-        needs: [ publish ]
+        needs: [ variables, publish ]
         uses: ./.github/workflows/_mc-publish.yml
         secrets: inherit
         with:
