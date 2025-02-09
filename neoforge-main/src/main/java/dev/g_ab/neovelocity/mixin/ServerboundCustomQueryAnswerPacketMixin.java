@@ -1,6 +1,5 @@
 package dev.g_ab.neovelocity.mixin;
 
-import dev.g_ab.neovelocity.NeoVelocityConfig;
 import dev.g_ab.neovelocity.VelocityProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;

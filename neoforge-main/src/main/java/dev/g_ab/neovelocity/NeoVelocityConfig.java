@@ -22,6 +22,11 @@ public class NeoVelocityConfig {
         NeoVelocity.getLogger().debug("Detected new secret!");
     }
 
+    public static void register(IEventBus bus, ModContainer mod) {
+        bus.addListener(NeoVelocityConfig::onFileChange);
+        mod.registerConfig(ModConfig.Type.COMMON, NeoVelocityConfig.commonSpec);
+    }
+
     public static class Common {
         public ModConfigSpec.ConfigValue<String> SECRET;
 
@@ -31,10 +36,5 @@ public class NeoVelocityConfig {
                 .comment("The Forwarding secret of your velocity proxy")
                 .define("forwarding-secret", "secret!");
         }
-    }
-
-    public static void register(IEventBus bus, ModContainer mod) {
-        bus.addListener(NeoVelocityConfig::onFileChange);
-        mod.registerConfig(ModConfig.Type.COMMON, NeoVelocityConfig.commonSpec);
     }
 }

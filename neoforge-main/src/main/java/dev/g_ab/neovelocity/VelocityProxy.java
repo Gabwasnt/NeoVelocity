@@ -20,12 +20,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 public class VelocityProxy {
-    private static final int SUPPORTED_FORWARDING_VERSION = 1;
     public static final int MODERN_FORWARDING_WITH_KEY = 2;
     public static final int MODERN_FORWARDING_WITH_KEY_V2 = 3;
     public static final int MODERN_LAZY_SESSION = 4;
-    public static final byte MAX_SUPPORTED_FORWARDING_VERSION = SUPPORTED_FORWARDING_VERSION;
     public static final ResourceLocation PLAYER_INFO_CHANNEL = ResourceLocation.fromNamespaceAndPath("velocity", "player_info");
+    private static final int SUPPORTED_FORWARDING_VERSION = 1;
+    public static final byte MAX_SUPPORTED_FORWARDING_VERSION = SUPPORTED_FORWARDING_VERSION;
 
     public static boolean checkIntegrity(final FriendlyByteBuf buf) {
         final byte[] signature = new byte[32];

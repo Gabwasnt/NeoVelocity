@@ -1,6 +1,5 @@
 package dev.g_ab.neovelocity.mixin;
 
-import dev.g_ab.neovelocity.NeoVelocityConfig;
 import dev.g_ab.neovelocity.VelocityLoginPacketListerImpl;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
