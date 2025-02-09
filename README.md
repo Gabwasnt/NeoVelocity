@@ -57,6 +57,10 @@ details—is transmitted reliably from the proxy to your server.
 
 You can contact me through my [GitHub](https://github.com/Gabwasnt) or on Discord as `g_ab`
 
+## Feature Request
+
+The project is open source you can contribute anytime. If you encounter any issues or want another compatibility layer you can contact me.
+
 ---
 
 NeoVelocity serves as an essential bridge between NeoForge and Velocity, ensuring that modded servers can benefit from
