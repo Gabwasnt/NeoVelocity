@@ -1,6 +1,5 @@
 package dev.g_ab.neovelocity.mixin;
 
-import dev.g_ab.neovelocity.NeoVelocityConfig;
 import dev.g_ab.neovelocity.VelocityProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
@@ -20,7 +19,6 @@ public class ServerboundCustomQueryAnswerPacketMixin {
 
     @Inject(method = "readPayload", at = @At("HEAD"), cancellable = true)
     private static void readPayload(int pTransactionId, FriendlyByteBuf pBuffer, CallbackInfoReturnable<CustomQueryAnswerPayload> cir) {
-        if (!NeoVelocityConfig.COMMON.ENABLED.get()) return;
         FriendlyByteBuf buffer = pBuffer.readNullable((buf2) -> {
             int i = buf2.readableBytes();
             if (i >= 0 && i <= MAX_PAYLOAD_SIZE) {

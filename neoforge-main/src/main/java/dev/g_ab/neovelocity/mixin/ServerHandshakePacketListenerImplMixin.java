@@ -1,6 +1,5 @@
 package dev.g_ab.neovelocity.mixin;
 
-import dev.g_ab.neovelocity.NeoVelocityConfig;
 import dev.g_ab.neovelocity.VelocityLoginPacketListerImpl;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
@@ -30,7 +29,6 @@ public class ServerHandshakePacketListenerImplMixin {
 
     @Inject(method = "handleIntention", at = @At("HEAD"), cancellable = true)
     public void handleIntention(ClientIntentionPacket packet, CallbackInfo ci) {
-        if (!NeoVelocityConfig.COMMON.ENABLED.get()) return;
         if (packet.intention() == ClientIntent.LOGIN) {
             this.connection.setupOutboundProtocol(LoginProtocols.CLIENTBOUND);
             if (packet.protocolVersion() != SharedConstants.getCurrentVersion().getProtocolVersion()) {
@@ -46,11 +44,11 @@ public class ServerHandshakePacketListenerImplMixin {
             } else {
                 this.connection.setupInboundProtocol(LoginProtocols.SERVERBOUND, new VelocityLoginPacketListerImpl(this.server, this.connection, false));
             }
-            ci.cancel();
         } else if (packet.intention() == ClientIntent.TRANSFER) {
             Component component = Component.literal("NUH-uh");
             this.connection.send(new ClientboundLoginDisconnectPacket(component));
             this.connection.disconnect(component);
         }
+        ci.cancel();
     }
 }

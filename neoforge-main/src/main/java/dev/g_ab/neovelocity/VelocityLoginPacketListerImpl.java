@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl {
     private static final Component DISCONNECT_UNEXPECTED_QUERY = Component.translatable("multiplayer.disconnect.unexpected_query_response");
+    private int velocityLoginMessageId = -1;
 
     public VelocityLoginPacketListerImpl(MinecraftServer server, Connection connection, boolean transferred) {
         super(server, connection, transferred);
@@ -25,29 +26,33 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
 
     @Override
     public void handleHello(ServerboundHelloPacket pPacket) {
-        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet", new Object[0]);
-        Validate.validState(StringUtil.isValidPlayerName(pPacket.name()), "Invalid characters in username", new Object[0]);
+        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet");
+        Validate.validState(StringUtil.isValidPlayerName(pPacket.name()), "Invalid characters in username");
 
-        int velocityLoginMessageId = ThreadLocalRandom.current().nextInt();
+        velocityLoginMessageId = ThreadLocalRandom.current().nextInt();
         ClientboundCustomQueryPacket packet = new ClientboundCustomQueryPacket(velocityLoginMessageId, new VelocityProxy.VersionPayload(VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION));
         this.connection.send(packet);
     }
 
     @Override
     public void handleCustomQueryPacket(ServerboundCustomQueryAnswerPacket packet) {
-        if (packet.transactionId() != packet.transactionId()) this.disconnect(DISCONNECT_UNEXPECTED_QUERY);
+        if (packet.transactionId() != velocityLoginMessageId || velocityLoginMessageId == -1) {
+            this.disconnect(DISCONNECT_UNEXPECTED_QUERY);
+            return;
+        }
+
         try {
             VelocityProxy.QueryAnswerPayload payload = (VelocityProxy.QueryAnswerPayload) packet.payload();
             if (payload == null) {
                 this.disconnect(Component.literal("This server requires you to connect with Velocity."));
-                NeoVelocity.getLogger().warn("Someone/{} tried to login without proxy details!!!! Ports are exposed, they shouldn't be!!!!!!!",this.connection.getRemoteAddress());
+                NeoVelocity.getLogger().warn("Someone/{} tried to login without proxy details!!!! Ports are exposed, they shouldn't be!!!!!!!", this.connection.getRemoteAddress());
                 return;
             }
 
             FriendlyByteBuf buf = payload.buffer();
             if (!VelocityProxy.checkIntegrity(buf)) {
-                this.disconnect(Component.literal("Unable to verify player details"));
-                NeoVelocity.getLogger().warn("Someone/{} is trying to login with invalid secrets! Make sure ports are not exposed or that your secrets are corrects on both sides!",this.connection.getRemoteAddress());
+                this.disconnect(Component.literal("Unable to verify player details."));
+                NeoVelocity.getLogger().warn("Someone/{} is trying to login with invalid secrets! Make sure ports are not exposed or that your secrets are corrects on both sides!", this.connection.getRemoteAddress());
                 return;
             }
 
