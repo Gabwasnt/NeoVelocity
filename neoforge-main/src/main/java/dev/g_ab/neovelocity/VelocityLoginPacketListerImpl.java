@@ -1,5 +1,6 @@
 package dev.g_ab.neovelocity;
 
+import com.mojang.authlib.GameProfile;
 import dev.g_ab.neovelocity.mixin.ConnectionAccessorMixin;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -69,7 +70,8 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
             InetSocketAddress address = new InetSocketAddress(VelocityProxy.readAddress(buf), port);
             ((ConnectionAccessorMixin) this.connection).neovelocity$setAddress(address);
 
-            this.startClientVerification(VelocityProxy.createProfile(buf));
+            this.authenticatedProfile = VelocityProxy.createProfile(buf);
+            this.state = ServerLoginPacketListenerImpl.State.VERIFYING;
 
             NeoVelocity.getLogger().info("Player {}({}) authenticated through the Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
         } catch (ClassCastException exception) {
