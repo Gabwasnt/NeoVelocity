@@ -118,8 +118,8 @@ dependencies {
     // Core Projects and Libraries
     //this {}
 
-    runtimeOnly(neoforged.testframework)
-    testImplementation(neoforged.testframework)
+    //runtimeOnly(neoforged.testframework)
+    //testImplementation(neoforged.testframework)
 }
 
 tasks.withType<ProcessResources> {
@@ -142,10 +142,10 @@ tasks.withType<Jar> {
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date())
         attributes(
             mapOf(
-                "Specification-Title" to "G_ab/Gabwasnt",
+                "Specification-Title" to "NeoVelocity",
                 "Specification-Vendor" to "G_ab/Gabwasnt",
                 "Specification-Version" to "1",
-                "Implementation-Title" to "G_ab/Gabwasnt",
+                "Implementation-Title" to "dev.g-ab",
                 "Implementation-Version" to archiveVersion,
                 "Implementation-Vendor" to "G_ab/Gabwasnt",
                 "Implementation-Timestamp" to now,

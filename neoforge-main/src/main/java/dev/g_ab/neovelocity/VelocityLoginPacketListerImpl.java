@@ -1,6 +1,7 @@
 package dev.g_ab.neovelocity;
 
-import dev.g_ab.neovelocity.mixin.ConnectionAccessor;
+import com.mojang.authlib.GameProfile;
+import dev.g_ab.neovelocity.mixin.ConnectionAccessorMixin;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,9 +30,8 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
         Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet");
         Validate.validState(StringUtil.isValidPlayerName(pPacket.name()), "Invalid characters in username");
 
-        velocityLoginMessageId = ThreadLocalRandom.current().nextInt();
-        ClientboundCustomQueryPacket packet = new ClientboundCustomQueryPacket(velocityLoginMessageId, new VelocityProxy.VersionPayload(VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION));
-        this.connection.send(packet);
+        this.velocityLoginMessageId = ThreadLocalRandom.current().nextInt();
+        this.connection.send(new ClientboundCustomQueryPacket(velocityLoginMessageId, new VelocityProxy.VersionPayload(VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION)));
     }
 
     @Override
@@ -68,12 +68,12 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
             }
 
             InetSocketAddress address = new InetSocketAddress(VelocityProxy.readAddress(buf), port);
-            ((ConnectionAccessor) this.connection).neovelocity$setAddress(address);
+            ((ConnectionAccessorMixin) this.connection).neovelocity$setAddress(address);
 
-            startClientVerification(VelocityProxy.createProfile(buf));
+            this.authenticatedProfile = VelocityProxy.createProfile(buf);
+            this.state = ServerLoginPacketListenerImpl.State.VERIFYING;
 
-            NeoVelocity.getLogger().info("Player {}({}) authenticated through Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
-
+            NeoVelocity.getLogger().info("Player {}({}) authenticated through the Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
         } catch (ClassCastException exception) {
             this.disconnect(Component.literal("Velocity Forwarding error pls report to sever admins"));
             NeoVelocity.LOGGER.error("Error from casting packet", exception);
