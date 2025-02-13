@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
++ Added a port of CrossStitch
+
 ## [1.1.0](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.1.0) - 2025-02-09
 
 + Removed the option to enabled - just remove the mod to disable

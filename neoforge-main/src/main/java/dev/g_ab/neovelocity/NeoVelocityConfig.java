@@ -31,7 +31,6 @@ public class NeoVelocityConfig {
         public ModConfigSpec.ConfigValue<String> SECRET;
 
         Common(ModConfigSpec.Builder builder) {
-            builder.comment("Configure the NeoVelocity Server mod");
             SECRET = builder
                 .comment("The Forwarding secret of your velocity proxy")
                 .define("forwarding-secret", "secret!");

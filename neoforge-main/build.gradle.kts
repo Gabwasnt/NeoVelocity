@@ -118,8 +118,8 @@ dependencies {
     // Core Projects and Libraries
     //this {}
 
-    runtimeOnly(neoforged.testframework)
-    testImplementation(neoforged.testframework)
+    //runtimeOnly(neoforged.testframework)
+    //testImplementation(neoforged.testframework)
 }
 
 tasks.withType<ProcessResources> {

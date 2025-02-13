@@ -1,6 +1,6 @@
 package dev.g_ab.neovelocity;
 
-import dev.g_ab.neovelocity.mixin.ConnectionAccessor;
+import dev.g_ab.neovelocity.mixin.ConnectionAccessorMixin;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -67,7 +67,7 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
             }
 
             InetSocketAddress address = new InetSocketAddress(VelocityProxy.readAddress(buf), port);
-            ((ConnectionAccessor) this.connection).neovelocity$setAddress(address);
+            ((ConnectionAccessorMixin) this.connection).neovelocity$setAddress(address);
 
             this.startClientVerification(VelocityProxy.createProfile(buf));
 

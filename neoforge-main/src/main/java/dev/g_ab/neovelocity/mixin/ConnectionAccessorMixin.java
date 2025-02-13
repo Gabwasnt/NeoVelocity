@@ -8,7 +8,7 @@ import java.net.SocketAddress;
 
 
 @Mixin({Connection.class})
-public interface ConnectionAccessor {
+public interface ConnectionAccessorMixin {
     @Accessor("address")
     void neovelocity$setAddress(SocketAddress address);
 }
