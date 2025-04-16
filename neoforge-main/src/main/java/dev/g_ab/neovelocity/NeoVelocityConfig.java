@@ -53,10 +53,10 @@ public class NeoVelocityConfig {
         private void updateSecretFromConfig(){
             if (this.SECRET.get().endsWith(".secret")) {
                 Path path = FMLPaths.CONFIGDIR.get().resolve(this.SECRET.get());
-                if (!path.toFile().exists()) {
+                if (!Files.exists(path)) {
                     NeoVelocity.getLogger().warn("The secret file at {} , is not present!", path);
                 } else try {
-                    this.secret = Files.readString(path).getBytes(StandardCharsets.UTF_8);
+                    this.secret = String.join("", Files.readAllLines(path)).getBytes(StandardCharsets.UTF_8);
                 } catch (IOException e) {
                     this.secret = null;
                 }
