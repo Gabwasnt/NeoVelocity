@@ -59,9 +59,11 @@ public class NeoVelocityConfig {
                     } else try {
                         this.secret = String.join("", Files.readAllLines(path)).getBytes(StandardCharsets.UTF_8);
                     } catch (IOException e) {
+                        NeoVelocity.getLogger().warn("Error reading {} , make sure it is UTF-8 encoded and not empty!", path);
                         this.secret = null;
                     }
                 } catch (InvalidPathException e) {
+                    NeoVelocity.getLogger().warn("The provided file path for the secret file is invalid!");
                     this.secret = null;
                 }
             } else this.secret = this.SECRET.get().getBytes(StandardCharsets.UTF_8);
