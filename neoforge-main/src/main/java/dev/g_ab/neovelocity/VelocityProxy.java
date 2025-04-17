@@ -27,7 +27,10 @@ public class VelocityProxy {
     public static final byte MAX_SUPPORTED_FORWARDING_VERSION = SUPPORTED_FORWARDING_VERSION;
 
     public static boolean checkIntegrity(final FriendlyByteBuf buf) {
-        if (NeoVelocityConfig.COMMON.secret == null) return false;
+        if (NeoVelocityConfig.COMMON.secret == null) {
+            NeoVelocity.getLogger().warn("Invalid secret, failing integrity check! Check logs and the current config.");
+            return false;
+        }
         final byte[] signature = new byte[32];
         buf.readBytes(signature);
 

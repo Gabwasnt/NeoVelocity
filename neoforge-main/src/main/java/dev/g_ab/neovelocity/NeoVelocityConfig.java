@@ -57,6 +57,7 @@ public class NeoVelocityConfig {
                     if (!Files.exists(path)) {
                         NeoVelocity.getLogger().warn("The secret file at {} , is not present!", path);
                     } else try {
+                        NeoVelocity.getLogger().info("Secret file loaded from {}",path);
                         this.secret = String.join("", Files.readAllLines(path)).getBytes(StandardCharsets.UTF_8);
                     } catch (IOException e) {
                         NeoVelocity.getLogger().warn("Error reading {} , make sure it is UTF-8 encoded and not empty!", path);
@@ -66,7 +67,10 @@ public class NeoVelocityConfig {
                     NeoVelocity.getLogger().warn("The provided file path for the secret file is invalid!");
                     this.secret = null;
                 }
-            } else this.secret = this.SECRET.get().getBytes(StandardCharsets.UTF_8);
+            } else {
+                NeoVelocity.getLogger().info("Secret loaded from the config.");
+                this.secret = this.SECRET.get().getBytes(StandardCharsets.UTF_8);
+            }
         }
     }
 }

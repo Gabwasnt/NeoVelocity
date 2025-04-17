@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
 + Added support for an external file as the secret. The config treats it as a file if it ends with `.secret`, the usage of `..` is allowed in the path.
++ 1.21.5 compatibility!
 
 ## [1.2.0](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.2.0) - 2025-02-13
 
