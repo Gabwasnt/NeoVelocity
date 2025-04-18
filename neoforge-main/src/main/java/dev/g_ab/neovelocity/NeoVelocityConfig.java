@@ -46,12 +46,11 @@ public class NeoVelocityConfig {
     }
 
     public static class Common {
+        private static final String PLACEHOLDER = "<YOUR_SECRET_HERE>";
         private final ModConfigSpec.ConfigValue<String> SECRET;
         private final ModConfigSpec.EnumValue<SecretType> TYPE;
         public boolean secretValid = false;
         public byte[] secret = new byte[0];
-
-        private static final String PLACEHOLDER = "<YOUR_SECRET_HERE>";
 
         Common(ModConfigSpec.Builder builder) {
             builder
