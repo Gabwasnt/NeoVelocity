@@ -112,6 +112,10 @@ repositories {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
     }
+
+    maven("https://maven.su5ed.dev/releases") {
+        name = "ForgifiedFabricAPI"
+    }
 }
 
 dependencies {
@@ -120,6 +124,8 @@ dependencies {
 
     //runtimeOnly(neoforged.testframework)
     //testImplementation(neoforged.testframework)
+    implementation("org.sinytra.forgified-fabric-api:fabric-networking-api-v1:4.3.0+0d25d43e19")
+    implementation("org.sinytra.forgified-fabric-api:fabric-api-base:0.4.42+d1308ded19")
 }
 
 tasks.withType<ProcessResources> {
