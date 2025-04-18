@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
+## [1.2.1](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.2.1) - 2025-04-18
+
 + Added support for loading Velocity forwarding secret from an external UTF-8 encoded file via 'forwarding-secret-type'. [#11](https://github.com/Gabwasnt/NeoVelocity/issues/11)
 + 1.21.5 compatibility!
 
