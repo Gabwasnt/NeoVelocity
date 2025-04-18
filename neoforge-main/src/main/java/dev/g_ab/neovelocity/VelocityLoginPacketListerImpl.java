@@ -1,6 +1,5 @@
 package dev.g_ab.neovelocity;
 
-import com.mojang.authlib.GameProfile;
 import dev.g_ab.neovelocity.mixin.ConnectionAccessorMixin;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -30,35 +29,42 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
         Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet");
         Validate.validState(StringUtil.isValidPlayerName(pPacket.name()), "Invalid characters in username");
 
-        this.velocityLoginMessageId = ThreadLocalRandom.current().nextInt();
+        this.velocityLoginMessageId = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
         this.connection.send(new ClientboundCustomQueryPacket(velocityLoginMessageId, new VelocityProxy.VersionPayload(VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION)));
     }
 
     @Override
     public void handleCustomQueryPacket(ServerboundCustomQueryAnswerPacket packet) {
-        if (packet.transactionId() != velocityLoginMessageId || velocityLoginMessageId == -1) {
+        if (packet.transactionId() != velocityLoginMessageId || velocityLoginMessageId < 0) {
             this.disconnect(DISCONNECT_UNEXPECTED_QUERY);
             return;
         }
 
         try {
             VelocityProxy.QueryAnswerPayload payload = (VelocityProxy.QueryAnswerPayload) packet.payload();
+
             if (payload == null) {
                 this.disconnect(Component.literal("This server requires you to connect with Velocity."));
-                NeoVelocity.getLogger().warn("Someone/{} tried to login without proxy details!!!! Ports are exposed, they shouldn't be!!!!!!!", this.connection.getRemoteAddress());
+                NeoVelocity.getLogger().warn("Login attempt without proxy details from {}", this.connection.getRemoteAddress());
+                return;
+            }
+
+            if (!NeoVelocityConfig.COMMON.secretValid) {
+                this.disconnect(Component.literal("Invalid server secret configuration."));
+                NeoVelocity.getLogger().warn("Invalid secret; failing integrity check.");
                 return;
             }
 
             FriendlyByteBuf buf = payload.buffer();
             if (!VelocityProxy.checkIntegrity(buf)) {
                 this.disconnect(Component.literal("Unable to verify player details."));
-                NeoVelocity.getLogger().warn("Someone/{} is trying to login with invalid secrets! Make sure ports are not exposed or that your secrets are corrects on both sides!", this.connection.getRemoteAddress());
+                NeoVelocity.getLogger().warn("Integrity check failed for {}", this.connection.getRemoteAddress());
                 return;
             }
 
             int version = buf.readVarInt();
             if (version > VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION) {
-                throw new IllegalStateException("Unsupported forwarding version " + version + ", wanted upto " + VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
+                throw new IllegalStateException(String.format("Unsupported forwarding version %d, supported up to %d", version, VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION));
             }
 
             SocketAddress listening = this.connection.getRemoteAddress();
@@ -73,7 +79,7 @@ public class VelocityLoginPacketListerImpl extends ServerLoginPacketListenerImpl
             this.authenticatedProfile = VelocityProxy.createProfile(buf);
             this.state = ServerLoginPacketListenerImpl.State.VERIFYING;
 
-            NeoVelocity.getLogger().info("Player {}({}) authenticated through the Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
+            NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
         } catch (ClassCastException exception) {
             this.disconnect(Component.literal("Velocity Forwarding error pls report to sever admins"));
             NeoVelocity.LOGGER.error("Error from casting packet", exception);
