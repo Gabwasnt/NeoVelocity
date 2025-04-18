@@ -54,7 +54,7 @@ public class NeoVelocityConfig {
                 .comment("Configuration for the forwarding secret:")
                 .comment("  - IN_LINE: Use the secret value directly.")
                 .comment("  - FILE: Load secret from a UTF-8 encoded file, value is a path relative to run directory.");
-            SECRET = builder.define("forwarding-secret-value", "secret!");
+            SECRET = builder.define("forwarding-secret", "secret!");
             TYPE = builder.defineEnum("forwarding-secret-type", SecretType.IN_LINE);
         }
 
@@ -65,7 +65,7 @@ public class NeoVelocityConfig {
                     if (!Files.exists(path)) {
                         NeoVelocity.getLogger().warn("The secret file at {} , is not present!", path);
                     } else try {
-                        NeoVelocity.getLogger().info("Secret file loaded from {}", path);
+                        NeoVelocity.getLogger().info("Secret loaded from {}", path);
                         this.secret = String.join("", Files.readAllLines(path)).getBytes(StandardCharsets.UTF_8);
                     } catch (IOException e) {
                         NeoVelocity.getLogger().warn("Error reading {} , make sure it is UTF-8 encoded and not empty!", path);
