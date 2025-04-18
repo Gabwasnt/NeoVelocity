@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -36,7 +35,7 @@ public class VelocityProxy {
 
         try {
             final Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(NeoVelocityConfig.COMMON.SECRET.get().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            mac.init(new SecretKeySpec(NeoVelocityConfig.COMMON.secret, "HmacSHA256"));
             final byte[] mySignature = mac.doFinal(data);
 
             if (!MessageDigest.isEqual(signature, mySignature)) {

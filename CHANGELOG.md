@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
++ Added support for loading Velocity forwarding secret from an external UTF-8 encoded file via 'forwarding-secret-type'. [#11](https://github.com/Gabwasnt/NeoVelocity/issues/11)
++ 1.21.5 compatibility!
+
 ## [1.2.0](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v1.2.0) - 2025-02-13
 
 + Added a port of CrossStitch
