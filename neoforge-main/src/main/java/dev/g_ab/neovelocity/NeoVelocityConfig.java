@@ -38,26 +38,34 @@ public class NeoVelocityConfig {
         mod.registerConfig(ModConfig.Type.COMMON, NeoVelocityConfig.commonSpec);
     }
 
+    public enum SecretType {
+        IN_LINE,
+        FILE
+    }
+
     public static class Common {
-        private ModConfigSpec.ConfigValue<String> SECRET;
+        private final ModConfigSpec.ConfigValue<String> SECRET;
+        private final ModConfigSpec.EnumValue<SecretType> TYPE;
         public byte @Nullable [] secret;
 
         Common(ModConfigSpec.Builder builder) {
-            SECRET = builder
-                .comment("The Forwarding secret of your velocity proxy.")
-                .comment("If the provided string ends with `.secret`, it is treated as a path to a file in the running directory.")
-                .comment("The file is expected to be UTF-8 encoded and not empty.")
-                .define("forwarding-secret", "Insert-Here");
+            builder
+                .comment("The forwarding secret is used to authenticate with your Velocity proxy.")
+                .comment("Configuration for the forwarding secret:")
+                .comment("  - IN_LINE: Use the secret value directly.")
+                .comment("  - FILE: Load secret from a UTF-8 encoded file, value is a path relative to run directory.");
+            SECRET = builder.define("forwarding-secret-value", "secret!");
+            TYPE = builder.defineEnum("forwarding-secret-type", SecretType.IN_LINE);
         }
 
         private void updateSecretFromConfig() {
-            if (this.SECRET.get().endsWith(".secret")) {
+            if (TYPE.get() == SecretType.FILE) {
                 try {
                     Path path = Path.of(this.SECRET.get());
                     if (!Files.exists(path)) {
                         NeoVelocity.getLogger().warn("The secret file at {} , is not present!", path);
                     } else try {
-                        NeoVelocity.getLogger().info("Secret file loaded from {}",path);
+                        NeoVelocity.getLogger().info("Secret file loaded from {}", path);
                         this.secret = String.join("", Files.readAllLines(path)).getBytes(StandardCharsets.UTF_8);
                     } catch (IOException e) {
                         NeoVelocity.getLogger().warn("Error reading {} , make sure it is UTF-8 encoded and not empty!", path);
@@ -67,7 +75,7 @@ public class NeoVelocityConfig {
                     NeoVelocity.getLogger().warn("The provided file path for the secret file is invalid!");
                     this.secret = null;
                 }
-            } else {
+            } else if (TYPE.get() == SecretType.IN_LINE) {
                 NeoVelocity.getLogger().info("Secret loaded from the config.");
                 this.secret = this.SECRET.get().getBytes(StandardCharsets.UTF_8);
             }
