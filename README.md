@@ -30,8 +30,11 @@ details—is transmitted reliably from the proxy to your server.
 
 4. **Setting The Secret:**  
    Simply open the config file located at: `config/neovelocity-common.toml`, and change the secret to the one assigned
-   to your proxy. Usually the secret is inside the file: `forwarding.secret` inside your proxy's running directory. More over, the entry is treated as a path to a file containing the secret, if it ends with `.secret`. This file has to be UTF-8 encoded and non-empty.
-   *(This can be done while the server is running the config will be automatically reloaded!)*
+   to your proxy. Usually the secret is inside the file: `forwarding.secret` inside your proxy's running directory.  
+   You can choose how to provide the secret:
+    - **Inline (default):** Just paste the secret directly into the config file.
+    - **File:** You can instead provide the path to a file containing the secret (make sure the file is in UTF-8 format).  
+    *(This can be done while the server is running; the config will be automatically reloaded!)*
 
 5. **Tell Velocity About The Mods:**  
    You need to add `-Dvelocity.max-known-packs=[n]` to launch arguments of Velocity otherwise it won't let you connect.
