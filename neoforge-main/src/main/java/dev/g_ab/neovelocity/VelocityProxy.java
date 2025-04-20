@@ -80,6 +80,7 @@ public class VelocityProxy {
         @Override
         public void write(final FriendlyByteBuf buf) {
         }
+
     }
 
     public record VersionPayload(byte version) implements CustomQueryPayload {
