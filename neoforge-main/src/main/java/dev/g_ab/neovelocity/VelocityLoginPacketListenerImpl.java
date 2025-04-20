@@ -46,15 +46,14 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
             return;
         }
         if (velocityLoginMessageId > 0 && packet.transactionId() == velocityLoginMessageId) {
-            if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload payload) {
-                FriendlyByteBuf buf = payload.buffer();
-                if (!VelocityProxy.checkIntegrity(buf)) {
+            if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload(FriendlyByteBuf buffer)) {
+                if (!VelocityProxy.checkIntegrity(buffer)) {
                     this.disconnect(Component.literal("Unable to verify player details."));
-                    NeoVelocity.getLogger().warn("Integrity check failed for {}", this.connection.getRemoteAddress());
+                    NeoVelocity.getLogger().warn("Integrity check failed for {} (Invalid secret)", this.connection.getRemoteAddress());
                     return;
                 }
 
-                int version = buf.readVarInt();
+                int version = buffer.readVarInt();
                 if (version > VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION) {
                     this.disconnect(Component.literal(String.format("Unsupported forwarding version %d, supported up to %d", version, VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION)));
                     return;
@@ -66,20 +65,25 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
                     port = ((InetSocketAddress) listening).getPort();
                 }
 
-                InetSocketAddress address = new InetSocketAddress(VelocityProxy.readAddress(buf), port);
+                InetSocketAddress address = new InetSocketAddress(VelocityProxy.readAddress(buffer), port);
                 ((ConnectionAccessorMixin) this.connection).neovelocity$setAddress(address);
 
                 if (ModList.get().isLoaded("fabric_networking_api_v1")) fixFabricNetworkingIssue();
 
-                this.authenticatedProfile = VelocityProxy.createProfile(buf);
+                this.authenticatedProfile = VelocityProxy.createProfile(buffer);
                 this.state = ServerLoginPacketListenerImpl.State.VERIFYING;
 
                 NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
             } else {
-                this.disconnect(Component.literal("Incompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
                 StringBuilder modDump = new StringBuilder("Mod List:\n\tName Version (Mod Id)");
                 ModList.get().getMods().forEach(mod -> modDump.append("\n\t").append(mod.getDisplayName()).append(" ").append(mod.getVersion().toString()).append(" (").append(mod.getModId()).append(")"));
-                NeoVelocity.getLogger().error("Velocity authentication packets were modified unexpectedly." + " This is likely caused by an incompatible mod interfering with the login process." + "Please report this issue at https://github.com/Gabwasnt/NeoVelocity and include the following:\n{}", modDump);
+                if (NeoVelocityConfig.COMMON.LOGIN_CUSTOM_PACKET_CATCHALL.get()) {
+                    this.disconnect(Component.literal("Incompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
+                    NeoVelocity.getLogger().error("Velocity authentication packets were modified unexpectedly. This is likely caused by an incompatible mod interfering with the login process. Please report this issue at https://github.com/Gabwasnt/NeoVelocity and include the following:\n{}", modDump);
+                } else {
+                    this.disconnect(Component.literal("Unable to verify player details.\nor\nIncompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
+                    NeoVelocity.getLogger().error("Integrity check failed for {} (Invalid secret) or Velocity authentication packets were modified unexpectedly. This is likely caused by an incompatible mod interfering with the login process. Please report this issue at https://github.com/Gabwasnt/NeoVelocity and include the following:\n{}", this.connection.getRemoteAddress(), modDump);
+                }
             }
         } else super.handleCustomQueryPacket(packet);
     }
