@@ -16,7 +16,9 @@ details—is transmitted reliably from the proxy to your server.
 - **Configuration File:** On first startup, the mod creates a default configuration file.
 - **Forgified Fabric API Compatibility:** Automatically detects when the Fabric Networking API  
   v1 (`fabric_networking_api_v1`) is present and applies a workaround during the login handshake  
-  to ensure everything works smoothly.
+  to ensure everything works smoothly.  
+  *(If you're using a mod that sends login-phase packets through F-FAPI — such as certain Fabric mods —  
+  and experience issues, set `login-custom-packet-catchall` to `false` in the config to allow them to work properly.)*
 
 ## Installation
 
@@ -46,6 +48,11 @@ details—is transmitted reliably from the proxy to your server.
    See [Docs](https://docs.papermc.io/velocity/reference/system-properties#velocitymax-known-packs) for more
    information.
 
+6. **Mod Compatibility:**  
+   If you are unable to connect due to `Took too long to log in`, or use Fabric mods that send custom login packets  
+   (e.g., through F-FAPI), open the config file and set `login-custom-packet-catchall` to `false` to allow
+   compatibility.
+
 ## Usage Notes
 
 - **Port Leaking:**  
@@ -53,19 +60,28 @@ details—is transmitted reliably from the proxy to your server.
   forwarding secret and successfully authenticate any account.
 
 - **Troubleshooting:**  
-  **Possible Disconnect Messages**
+  **Possible Disconnect Messages:**
     - `Unable to verify player details.`:  
       This means your forwarding secret is not the same as the proxy's. Please refer
       to the Installation step 4.
     - `Unsupported forwarding version.`:  
       This means you are not using the right forwarding method on your proxy. If you
-      wish for me to implement more methods send me a DM on discord or open an Issue on GitHub.
+      wish for me to implement more methods send me a DM on discord or open
+      an [issue](https://github.com/Gabwasnt/NeoVelocity/issues/new?template=Blank+issue) on GitHub.
     - `This server requires you to connect with Velocity.`:  
       This means you are connecting to the server directly, you
       need to be connecting through the proxy.
     - `Unable to connect you to {servername}. Please try again later.`:  
       This is velocity related, make sure Installation
       step 5 is done properly otherwise you might want to see you Velocity logs.
+    - `Incompatible mod detected during login.`:  
+      This means another mod is interfering with the login phase. Either remove it or  
+      try to set `login-custom-packet-catchall` to `false` in the config otherwise open
+      an [issue](https://github.com/Gabwasnt/NeoVelocity/issues/new?template=Blank+issue).
+      Make sure to include the mod list printed in the server logs.
+    - `Took too long to log in`:  
+      This could mean a mod is sending unexpected login packets. Try setting  
+      `login-custom-packet-catchall` to `false` in the config.
 
 - **Further Documentation:**  
   For comprehensive guidance on setting up and fine-tuning your Velocity proxy—including details on advanced
