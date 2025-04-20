@@ -79,6 +79,10 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
             } else {
                 this.disconnect(Component.literal("A mod on the server is incompatible, check logs!"));
                 NeoVelocity.getLogger().error("A mod on the server is changing Velocity authentication packets!");
+                this.disconnect(Component.literal("Incompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
+                StringBuilder modDump = new StringBuilder("Mod List:\n\tName Version (Mod Id)");
+                ModList.get().getMods().forEach(mod -> modDump.append("\n\t").append(mod.getDisplayName()).append(" ").append(mod.getVersion().toString()).append(" (").append(mod.getModId()).append(")"));
+                NeoVelocity.getLogger().error("Velocity authentication packets were modified unexpectedly." + " This is likely caused by an incompatible mod interfering with the login process." + "Please report this issue at https://github.com/Gabwasnt/NeoVelocity and include the following:\n{}", modDump);
             }
         } else super.handleCustomQueryPacket(packet);
     }
@@ -93,12 +97,11 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
             Field channelsField = addonClass.getDeclaredField("channels");
             channelsField.setAccessible(true);
 
-            @SuppressWarnings("unchecked")
-            Map<Integer, ResourceLocation> channels = (Map<Integer, ResourceLocation>) channelsField.get(addon);
+            @SuppressWarnings("unchecked") Map<Integer, ResourceLocation> channels = (Map<Integer, ResourceLocation>) channelsField.get(addon);
             channels.remove(velocityLoginMessageId);
         } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException |
                  InvocationTargetException e) {
-            this.disconnect(Component.literal("Connection terminated: server encountered an error applying the Fabric Networking API workaround.\nThis is a server-side issue; please try reconnecting later or contact an administrator."));
+            this.disconnect(Component.literal("Server encountered an error applying the Fabric Networking API workaround.\nThis is a server-side issue. Please contact an administrator."));
             NeoVelocity.getLogger().error("Server-side compatibility workaround for Fabric Networking API v1 failed.", e);
         }
     }

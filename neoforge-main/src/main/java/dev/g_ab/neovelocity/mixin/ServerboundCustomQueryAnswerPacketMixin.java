@@ -4,7 +4,6 @@ import dev.g_ab.neovelocity.VelocityProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
 import net.minecraft.network.protocol.login.custom.CustomQueryAnswerPayload;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +28,7 @@ public class ServerboundCustomQueryAnswerPacketMixin {
             }
         });
 
+        //TODO make this less scuffed, I have no way of knowing what is my packet or not, no access to the handlers transaction id.
         if (buffer != null) {
             boolean integrity = VelocityProxy.checkIntegrity(buffer);
             buffer.resetReaderIndex();
