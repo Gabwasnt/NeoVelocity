@@ -40,13 +40,12 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
 
     @Override
     public void handleCustomQueryPacket(@NotNull ServerboundCustomQueryAnswerPacket packet) {
+        if (!NeoVelocityConfig.COMMON.secretValid) {
+            this.disconnect(Component.literal("Invalid server secret configuration."));
+            NeoVelocity.getLogger().warn("Invalid secret; failing integrity check.");
+            return;
+        }
         if (velocityLoginMessageId > 0 && packet.transactionId() == velocityLoginMessageId) {
-            if (!NeoVelocityConfig.COMMON.secretValid) {
-                this.disconnect(Component.literal("Invalid server secret configuration."));
-                NeoVelocity.getLogger().warn("Invalid secret; failing integrity check.");
-                return;
-            }
-
             if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload payload) {
                 FriendlyByteBuf buf = payload.buffer();
                 if (!VelocityProxy.checkIntegrity(buf)) {
@@ -77,8 +76,6 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
 
                 NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
             } else {
-                this.disconnect(Component.literal("A mod on the server is incompatible, check logs!"));
-                NeoVelocity.getLogger().error("A mod on the server is changing Velocity authentication packets!");
                 this.disconnect(Component.literal("Incompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
                 StringBuilder modDump = new StringBuilder("Mod List:\n\tName Version (Mod Id)");
                 ModList.get().getMods().forEach(mod -> modDump.append("\n\t").append(mod.getDisplayName()).append(" ").append(mod.getVersion().toString()).append(" (").append(mod.getModId()).append(")"));
