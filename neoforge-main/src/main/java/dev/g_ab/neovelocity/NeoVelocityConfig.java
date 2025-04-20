@@ -47,6 +47,7 @@ public class NeoVelocityConfig {
 
     public static class Common {
         private static final String PLACEHOLDER = "<YOUR_SECRET_HERE>";
+        public final ModConfigSpec.BooleanValue LOGIN_CUSTOM_PACKET_CATCHALL;
         private final ModConfigSpec.ConfigValue<String> SECRET;
         private final ModConfigSpec.EnumValue<SecretType> TYPE;
         public boolean secretValid = false;
@@ -54,12 +55,27 @@ public class NeoVelocityConfig {
 
         Common(ModConfigSpec.Builder builder) {
             builder
-                .comment("The forwarding secret is used to authenticate with your Velocity proxy.")
-                .comment("Configuration for the forwarding secret:")
-                .comment("  - IN_LINE: Use the secret value directly.")
-                .comment("  - FILE: Load secret from a UTF-8 encoded file, value is a path relative to run directory.");
+                .comment("""
+                    The forwarding secret is used to authenticate with your Velocity proxy.
+                    Configuration for the forwarding secret:
+                      - IN_LINE: Use the secret value directly.
+                      - FILE   : Load secret from a UTF-8 encoded file, value is a path relative to run directory.""");
+            builder.push("forwarding");
             SECRET = builder.define("forwarding-secret", PLACEHOLDER);
             TYPE = builder.defineEnum("forwarding-secret-type", SecretType.IN_LINE);
+            builder.pop();
+
+            builder.push("compatibility");
+            LOGIN_CUSTOM_PACKET_CATCHALL = builder
+                .comment("""
+                    Configuration for login-custom-packet-catchall:
+                      - true : NeoVelocity will treat all login packets as proxy authentication packets (recommended).
+                      - false: Only packets signed with your secret are considered proxy authentication packets.
+                               This allows unconventional login‑phase mods to work, but if your secret is wrong,
+                               the server won’t show a clear error.
+                    If you see `Took too long to log in` errors, try setting it to `false` to see if it fixes the issue.""")
+                .define("login-custom-packet-catchall", true);
+            builder.pop();
         }
 
         private void updateSecretFromConfig() {

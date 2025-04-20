@@ -14,6 +14,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
+                with:
+                    fetch-depth: 0
 
             -   name: Get Current Date
                 run: echo "date=$(date '+%Y.%m.%d')" >> $GITHUB_ENV
@@ -36,6 +38,15 @@ jobs:
                     # Ensure [Unreleased] section always has the correct compare link
                     sed -i.bak -E 's|^(## \[Unreleased\]).*|\1\(https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD\)|' "$changelog_file"
 
+                    # Determine previous tag (exclude current)
+                    prev_tag=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v "v${version}" | head -n1)
+                    if [ -z "$prev_tag" ]; then
+                        echo "No previous tag found, defaulting compare against dev"
+                        compare_from="dev"
+                    else
+                        compare_from="$prev_tag"
+                    fi
+
                     # Find line number of the Unreleased section
                     unreleased_line=$(grep -n "^## \[Unreleased\]" "$changelog_file" | cut -d: -f1)
 
@@ -45,7 +56,8 @@ jobs:
                     fi
 
                     # Insert the new release **right after** the Unreleased section
-                    new_release_section="## [${version}](https://github.com/Gabwasnt/NeoVelocity/compare/dev...v${version}) - ${release_date}"
+                    compare_url="https://github.com/Gabwasnt/NeoVelocity/compare/${compare_from}...v${version}"
+                    new_release_section="## [${version}](${compare_url}) - ${release_date}"
 
                     # Add the release notes by shifting lines down
                     sed -i.bak "${unreleased_line}a\\

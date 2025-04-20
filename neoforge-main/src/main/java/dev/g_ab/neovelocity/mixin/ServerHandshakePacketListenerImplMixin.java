@@ -1,6 +1,6 @@
 package dev.g_ab.neovelocity.mixin;
 
-import dev.g_ab.neovelocity.VelocityLoginPacketListerImpl;
+import dev.g_ab.neovelocity.VelocityLoginPacketListenerImpl;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -42,7 +42,7 @@ public class ServerHandshakePacketListenerImplMixin {
                 this.connection.send(new ClientboundLoginDisconnectPacket(component));
                 this.connection.disconnect(component);
             } else {
-                this.connection.setupInboundProtocol(LoginProtocols.SERVERBOUND, new VelocityLoginPacketListerImpl(this.server, this.connection, false));
+                this.connection.setupInboundProtocol(LoginProtocols.SERVERBOUND, new VelocityLoginPacketListenerImpl(this.server, this.connection, false));
             }
         } else if (packet.intention() == ClientIntent.TRANSFER) {
             Component component = Component.literal("NUH-uh");

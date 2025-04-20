@@ -30,16 +30,8 @@ jobs:
 
             -   name: Parse changelog
                 run: |
-                    # Getting the changelog
-                    changelog=$(cat CHANGELOG.md)
-
-                    # Parsing it
-                    list=$(echo "$changelog" | sed -n "/^## \[${{ inputs.version }}](.*)/,/^## \[[0-9]\+\.[0-9]\+\.[0-9a-zA-Z]\+](.*)/p" | sed -e '1d;$d')
-
-                    # Setting it to new file
-                    echo "$list" > RELEASE_CHANGELOG.md
-
-                    # Lil debug
+                    version="${{ inputs.version }}"
+                    sed -n -e "/^## \[${version}\]/,/^## \[.*\]/p" CHANGELOG.md | sed '1d;$d' > RELEASE_CHANGELOG.md
                     cat RELEASE_CHANGELOG.md
 
             -   name: Publish to Modrinth
