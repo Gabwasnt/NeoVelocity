@@ -14,6 +14,9 @@ details—is transmitted reliably from the proxy to your server.
 - **Modern Forwarding Support:** Implements Velocity’s native, modern forwarding protocol to securely receive player
   data.
 - **Configuration File:** On first startup, the mod creates a default configuration file.
+- **Forgified Fabric API Compatibility:** Automatically detects when the Fabric Networking API  
+  v1 (`fabric_networking_api_v1`) is present and applies a workaround during the login handshake  
+  to ensure everything works smoothly.
 
 ## Installation
 
@@ -33,8 +36,9 @@ details—is transmitted reliably from the proxy to your server.
    to your proxy. Usually the secret is inside the file: `forwarding.secret` inside your proxy's running directory.  
    You can choose how to provide the secret:
     - **Inline (default):** Just paste the secret directly into the config file.
-    - **File:** You can instead provide the path to a file containing the secret (make sure the file is in UTF-8 format).  
-    *(This can be done while the server is running; the config will be automatically reloaded!)*
+    - **File:** You can instead provide the path to a file containing the secret (make sure the file is in UTF-8
+      format).  
+      *(This can be done while the server is running; the config will be automatically reloaded!)*
 
 5. **Tell Velocity About The Mods:**  
    You need to add `-Dvelocity.max-known-packs=[n]` to launch arguments of Velocity otherwise it won't let you connect.
