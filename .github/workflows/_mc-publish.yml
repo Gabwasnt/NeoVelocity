@@ -30,8 +30,7 @@ jobs:
 
             -   name: Parse changelog
                 run: |
-                    version="${{ inputs.version }}"
-                    sed -n -e "/^## \[${version}\]/,/^## \[.*\]/p" CHANGELOG.md | sed '1d;$d' > RELEASE_CHANGELOG.md
+                    sed -n -e "/^## \[${{ inputs.version }}\]/,/^## \[.*\]/p" CHANGELOG.md | sed '1d;$d' > RELEASE_CHANGELOG.md
                     cat RELEASE_CHANGELOG.md
 
             -   name: Publish to Modrinth
