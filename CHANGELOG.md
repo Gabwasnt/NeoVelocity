@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
++ Fixed MOTD not passing through
+
 ## [1.2.2](https://github.com/Gabwasnt/NeoVelocity/compare/v1.2.1...v1.2.2) - 2025-04-20
 
 + Fixed incompatibility
