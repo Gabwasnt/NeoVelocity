@@ -37,7 +37,6 @@ public class VelocityProxy {
             final Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(NeoVelocityConfig.COMMON.secret, "HmacSHA256"));
             final byte[] mySignature = mac.doFinal(data);
-
             if (!MessageDigest.isEqual(signature, mySignature)) {
                 return false;
             }
@@ -78,7 +77,7 @@ public class VelocityProxy {
 
     public record QueryAnswerPayload(FriendlyByteBuf buffer) implements CustomQueryAnswerPayload {
         @Override
-        public void write(final FriendlyByteBuf buf) {
+        public void write(final @NotNull FriendlyByteBuf buf) {
         }
 
     }

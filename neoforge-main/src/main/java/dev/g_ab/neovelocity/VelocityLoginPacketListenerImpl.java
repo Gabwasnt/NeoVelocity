@@ -46,7 +46,11 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
             return;
         }
         if (velocityLoginMessageId > 0 && packet.transactionId() == velocityLoginMessageId) {
-            if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload(FriendlyByteBuf buffer)) {
+            if (packet.payload() == null) {
+                this.disconnect(Component.literal("This server requires you to connect with Velocity."));
+                NeoVelocity.getLogger().warn("Player connecting without Velocity {}", this.connection.getRemoteAddress());
+                return;
+            } else if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload(FriendlyByteBuf buffer)) {
                 if (!VelocityProxy.checkIntegrity(buffer)) {
                     this.disconnect(Component.literal("Unable to verify player details."));
                     NeoVelocity.getLogger().warn("Integrity check failed for {} (Invalid secret)", this.connection.getRemoteAddress());
