@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.login.ClientboundCustomQueryPacket;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.util.StringUtil;
@@ -73,7 +73,7 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
                 this.authenticatedProfile = VelocityProxy.createProfile(buffer);
                 this.state = ServerLoginPacketListenerImpl.State.VERIFYING;
 
-                NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
+                NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", this.authenticatedProfile.name(), this.authenticatedProfile.id());
             } else {
                 StringBuilder modDump = new StringBuilder("Mod List:\n\tName Version (Mod Id)");
                 ModList.get().getMods().forEach(mod -> modDump.append("\n\t").append(mod.getDisplayName()).append(" ").append(mod.getVersion().toString()).append(" (").append(mod.getModId()).append(")"));
@@ -98,7 +98,7 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
             Field channelsField = addonClass.getDeclaredField("channels");
             channelsField.setAccessible(true);
 
-            @SuppressWarnings("unchecked") Map<Integer, ResourceLocation> channels = (Map<Integer, ResourceLocation>) channelsField.get(addon);
+            @SuppressWarnings("unchecked") Map<Integer, Identifier> channels = (Map<Integer, Identifier>) channelsField.get(addon);
             channels.remove(velocityLoginMessageId);
         } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException |
                  InvocationTargetException e) {

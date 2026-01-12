@@ -31,12 +31,12 @@ public class ServerHandshakePacketListenerImplMixin {
     @Overwrite
     public void beginLogin(ClientIntentionPacket packet, boolean transferred) {
         this.connection.setupOutboundProtocol(LoginProtocols.CLIENTBOUND);
-        if (packet.protocolVersion() != SharedConstants.getCurrentVersion().getProtocolVersion()) {
+        if (packet.protocolVersion() != SharedConstants.getCurrentVersion().protocolVersion()) {
             Component component;
             if (packet.protocolVersion() < 754) {
-                component = Component.translatable("multiplayer.disconnect.outdated_client", SharedConstants.getCurrentVersion().getName());
+                component = Component.translatable("multiplayer.disconnect.outdated_client", SharedConstants.getCurrentVersion().name());
             } else {
-                component = Component.translatable("multiplayer.disconnect.incompatible", SharedConstants.getCurrentVersion().getName());
+                component = Component.translatable("multiplayer.disconnect.incompatible", SharedConstants.getCurrentVersion().name());
             }
 
             this.connection.send(new ClientboundLoginDisconnectPacket(component));

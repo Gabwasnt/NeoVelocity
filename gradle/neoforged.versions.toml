@@ -1,7 +1,7 @@
 [versions]
-neoforge = "21.1.119"
-mdg = "2.0.78"
-neoforgeRange = { require = "[21.1.119,)", prefer = "21.1.97" }
+neoforge = "21.11.25-beta"
+mdg = "2.0.139"
+neoforgeRange = { require = "[21.11.25-beta,)", prefer = "21.11.25-beta" }
 loaderRange = { require = "[4,)", prefer = "4" }
 
 #[libraries.testframework]

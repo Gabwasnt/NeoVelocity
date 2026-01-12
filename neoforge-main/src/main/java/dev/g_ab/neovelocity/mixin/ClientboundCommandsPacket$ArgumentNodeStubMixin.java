@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -96,7 +96,7 @@ public abstract class ClientboundCommandsPacket$ArgumentNodeStubMixin {
     @SuppressWarnings("unchecked")
     @Inject(method = "serializeCap(Lnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/commands/synchronization/ArgumentTypeInfo;Lnet/minecraft/commands/synchronization/ArgumentTypeInfo$Template;)V", at = @At("HEAD"), cancellable = true)
     private static <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>> void serializeCap(FriendlyByteBuf buffer, ArgumentTypeInfo<A, T> argumentInfo, ArgumentTypeInfo.Template<A> argumentInfoTemplate, CallbackInfo ci) {
-        ResourceLocation key = BuiltInRegistries.COMMAND_ARGUMENT_TYPE.getKey(argumentInfo);
+        Identifier key = BuiltInRegistries.COMMAND_ARGUMENT_TYPE.getKey(argumentInfo);
         if (key == null || !neoVelocity$vanillaArguments.contains(key.toString())) {
             ci.cancel();
             buffer.writeVarInt(MOD_ARGUMENT_INDICATOR);
