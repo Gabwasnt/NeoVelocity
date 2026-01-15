@@ -12,6 +12,7 @@ version = "${property("mod.version")}+${mcVersionLabel}"
 base.archivesName = property("mod.id") as String
 
 val requiredJava = when {
+    sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
     sc.current.parsed >= "1.20.6" -> JavaVersion.VERSION_21
     sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
     sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
@@ -126,26 +127,37 @@ tasks {
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
     }
+
+    named("publishMods") {
+        onlyIf {
+            (findProperty("publish.targets") as? String)?.split(' ')?.isNotEmpty() ?: false
+        }
+    }
 }
 
 publishMods {
+    val publishTitle = findProperty("publish.title") as? String?:""
+    val publishTarget = (findProperty("publish.targets") as? String)?.split(' ') ?: emptyList()
     val versionString = property("mod.version") as String
+    val modName = property("mod.name") as String
     val fullChangelog = rootProject.file("CHANGELOG.md").readText()
+    val parsedChangelog = "(?ms)^## \\[\\Q$versionString\\E\\].*?(?=^## \\[|\\z)".toRegex()
+        .find(fullChangelog)?.value?.substringAfter("\n")?.trim()?:""
+    val modrinthSlug = property("publish.modrinth") as String
 
     file = tasks.jar.map { it.archiveFile.get() }
     additionalFiles.from(tasks.named<Jar>("sourcesJar").map { it.archiveFile.get() })
-    displayName = "${property("mod.name")} ${property("mod.version")} for ${property("publish.title")}"
+    displayName = "$modName $versionString for $publishTitle"
     version = versionString
-    changelog = "(?ms)^## \\[\\Q$versionString\\E\\].*?(?=^## \\[|\\z)".toRegex()
-        .find(fullChangelog)?.value?.substringAfter("\n")?.trim()?:""
+    changelog = parsedChangelog
     type = STABLE
     modLoaders.add("neoforge")
 
-    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null || true
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
     modrinth {
-        projectId = property("publish.modrinth") as String
+        projectId = modrinthSlug
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-        minecraftVersions.addAll(property("publish.targets").toString().split(' '))
+        minecraftVersions.addAll(publishTarget)
     }
 }

@@ -1,6 +1,5 @@
 package dev.g_ab.neovelocity.mixin;
 
-import dev.g_ab.neovelocity.NeoVelocity;
 import dev.g_ab.neovelocity.VelocityLoginPacketListenerImpl;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
@@ -35,7 +34,7 @@ public class ServerHandshakePacketListenerImplMixin {
         int serverProtocol;
         String serverVersion;
 
-        //? if >=1.21.9 {
+        //? if >=1.21.6 {
         serverProtocol = SharedConstants.getCurrentVersion().protocolVersion();
         serverVersion = SharedConstants.getCurrentVersion().name();
         //?} else {
