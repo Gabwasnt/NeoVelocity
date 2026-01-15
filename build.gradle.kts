@@ -127,13 +127,6 @@ tasks {
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
     }
-
-    val hasTargets = (findProperty("publish.targets") as? String)?.split(' ')?.isNotEmpty()?: false
-    named("publishMods") {
-        onlyIf {
-            hasTargets
-        }
-    }
 }
 
 publishMods {
@@ -154,7 +147,7 @@ publishMods {
     type = STABLE
     modLoaders.add("neoforge")
 
-    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+    dryRun = publishTarget.isNotEmpty() && providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
     modrinth {
         projectId = modrinthSlug
