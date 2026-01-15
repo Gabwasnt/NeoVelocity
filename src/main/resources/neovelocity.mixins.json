@@ -2,7 +2,7 @@
     "required": true,
     "minVersion": "0.8",
     "package": "dev.g_ab.neovelocity.mixin",
-    "compatibilityLevel": "JAVA_21",
+    "compatibilityLevel": "${java}",
     "server": [
         "ClientboundCommandsPacket$ArgumentNodeStubMixin",
         "ConnectionAccessorMixin",

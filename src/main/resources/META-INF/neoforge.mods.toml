@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="${license}"
+
+[[mods]]
+modId = "${id}"
+displayName = "${name}"
+version = "${version}"
+authors = "${authors}"
+description = '''${description}'''
+updateJSONURL="https://api.modrinth.com/updates/neovelocity/forge_updates.json?neoforge=only"
+
+[[mixins]]
+config = "neovelocity.mixins.json"
+
+[[dependencies.${id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft}"
+ordering = "NONE"
+side = "BOTH"

@@ -15,28 +15,18 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 public class NeoVelocityConfig {
-    public static final NeoVelocityConfig.Common COMMON;
+    public static final Common COMMON;
     static final ModConfigSpec commonSpec;
 
     static {
-        final Pair<NeoVelocityConfig.Common, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(NeoVelocityConfig.Common::new);
+        final Pair<Common, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(Common::new);
         commonSpec = specPair.getRight();
         COMMON = specPair.getLeft();
     }
 
-//    public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-//        COMMON.updateSecretFromConfig();
-//    }
-//
-//    public static void onFileLoad(final ModConfigEvent.Loading configEvent) {
-//        COMMON.updateSecretFromConfig();
-//    }
-
     public static void register(IEventBus bus, ModContainer mod) {
         bus.addListener(ModConfigEvent.Loading.class, loading -> COMMON.updateSecretFromConfig());
         bus.addListener(ModConfigEvent.Reloading.class, loading -> COMMON.updateSecretFromConfig());
-//        bus.addListener(NeoVelocityConfig::onFileChange);
-//        bus.addListener(NeoVelocityConfig::onFileLoad);
         mod.registerConfig(ModConfig.Type.COMMON, NeoVelocityConfig.commonSpec);
     }
 

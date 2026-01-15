@@ -1,7 +1,6 @@
 package dev.g_ab.neovelocity;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -14,10 +13,6 @@ public class NeoVelocity {
 
     public NeoVelocity(IEventBus bus, ModContainer mod) {
         NeoVelocityConfig.register(bus, mod);
-    }
-
-    public static ResourceLocation asResource(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     public static Logger getLogger() {

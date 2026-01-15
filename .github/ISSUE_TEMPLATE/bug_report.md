@@ -1,62 +1,61 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Bug Report
+about: Create a report to help us improve NeoVelocity
 title: ''
-labels: bug, triage
+labels: bug, unverified
 assignees: ''
+---
+
+### Pre-Submission Checks
+<!-- Please check the following boxes before submitting. -->
+*   [ ] I am running the latest version of **NeoVelocity**.
+*   [ ] I have updated **Velocity Proxy** to the latest build.
+*   [ ] I have updated **NeoForge** to the latest version available for my Minecraft version.
 
 ---
 
-**Describe the bug**
-A clear and concise description of the bug you are experiencing.
+### Description
+<!-- Briefly describe the issue. Is it a crash, a disconnect, or a visual bug? -->
+
+
+### Steps to Reproduce
+<!-- How can we make this happen on our end? -->
+1.
+2.
+3.
+
+**Expected behavior:**
+**Actual behavior:**
 
 ---
 
-**Steps to Reproduce**
-List all steps needed to reproduce the issue:
-1. ...
-2. ...
-3. ...
-4. ...
+### Environment
+<!-- Please verify the exact versions below. "Latest" is not a version number. -->
+*   **Minecraft Version:**
+*   **NeoVelocity Version:**
+*   **Velocity Proxy Version:**
+*   **Hosting Platform:** (e.g., Pterodactyl, Docker, Localhost)
+
+### Logs (Required)
+<!-- Please upload your logs to https://mclo.gs/ and paste the links below. -->
+<!-- WE NEED BOTH LOGS TO DIAGNOSE CONNECTION ISSUES. -->
+
+*   **NeoForge Server Log:** [Link here]
+*   **Velocity Proxy Log:** [Link here]
+*   **Crash Report (if applicable):** [Link here]
 
 ---
 
-**Expected Behavior**
-What did you expect to happen? Please describe the intended outcome.
+### Configuration Check
+<!-- Please quickly verify your settings to save time. -->
 
----
+*   [ ] My Velocity `velocity.toml` is set to `player-info-forwarding-mode = "modern"`.
+*   [ ] I have checked that the `forwarding.secret` matches on both the proxy and the server.
+*   [ ] **Large Modpack?** I have tried adding `-Dvelocity.max-known-packs=128` to my Velocity startup flags.
+*   [ ] **Fabric/Sinytra?** I have tried setting `login-custom-packet-catchall = false` in `neovelocity-common.toml`.
 
-**Actual Behavior**
-What actually happened? (If different from above.)
+### Disconnect Message
+<!-- If you were kicked from the server, what was the exact message on the screen? -->
 
----
-
-**Environment & Setup**  
-Please fill out as much as possible:
-- **Minecraft version:**  
-- **NeoVelocity version:**  
-- **Velocity version:**  
-- **Hosting Platform:** (e.g., Pterodactyl, Pelican, Local Server, etc.)
-- **Velocity Config:**  (Provide a link to the full configuration file using any text sharing service (such as GitHub Gist, mclo.gs, Hastebin, etc.), with sensitive information redacted. Paste any especially relevant sections below.)
-- **Velocity Plugins:**  (List all installed plugins)
-- **Server Mods:**  (List all installed mods)
-- **Other relevant configs:** (server.properties, etc.)
-
----
-
-**Log Files / Crash Reports**  
-- **Latest.log** (attach or paste relevant section)
-- **Crash Report** (if applicable, attach or paste)
-- **Other error messages:** (if any)
-
----
-
-**Troubleshooting Performed**
-- [ ] Removed other mods/plugins to see if the issue persists  
-- [ ] Tried a clean configuration  
-- [ ] Identified a possible conflicting mod/plugin (please specify):
-
----
-
-**Additional Context**
-Add any other information or context that might help diagnose the issue.
+### Additional Context
+<!-- Add any other context about the problem here. -->

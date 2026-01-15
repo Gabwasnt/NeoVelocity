@@ -6,7 +6,6 @@ import com.mojang.authlib.properties.Property;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.login.custom.CustomQueryAnswerPayload;
 import net.minecraft.network.protocol.login.custom.CustomQueryPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.ProfilePublicKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +21,11 @@ public class VelocityProxy {
     public static final int MODERN_FORWARDING_WITH_KEY = 2;
     public static final int MODERN_FORWARDING_WITH_KEY_V2 = 3;
     public static final int MODERN_LAZY_SESSION = 4;
-    public static final ResourceLocation PLAYER_INFO_CHANNEL = ResourceLocation.fromNamespaceAndPath("velocity", "player_info");
+    //? if >=1.21.11 {
+    public static final net.minecraft.resources.Identifier PLAYER_INFO_CHANNEL = net.minecraft.resources.Identifier.fromNamespaceAndPath("velocity", "player_info");
+    //?} else {
+    //public static final net.minecraft.resources.ResourceLocation PLAYER_INFO_CHANNEL = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("velocity", "player_info");
+    //?}
     private static final int SUPPORTED_FORWARDING_VERSION = 1;
     public static final byte MAX_SUPPORTED_FORWARDING_VERSION = SUPPORTED_FORWARDING_VERSION;
 
@@ -37,7 +40,6 @@ public class VelocityProxy {
             final Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(NeoVelocityConfig.COMMON.secret, "HmacSHA256"));
             final byte[] mySignature = mac.doFinal(data);
-
             if (!MessageDigest.isEqual(signature, mySignature)) {
                 return false;
             }
@@ -64,7 +66,11 @@ public class VelocityProxy {
             final String name = buf.readUtf(Short.MAX_VALUE);
             final String value = buf.readUtf(Short.MAX_VALUE);
             final String signature = buf.readBoolean() ? buf.readUtf(Short.MAX_VALUE) : null;
-            profile.getProperties().put(name, new Property(name, value, signature));
+            //? if >=1.21.9 {
+            profile.properties().put(name, new Property(name, value, signature));
+            //?} else {
+            /*profile.getProperties().put(name, new Property(name, value, signature));*/
+            //?}
         }
     }
 
@@ -78,23 +84,31 @@ public class VelocityProxy {
 
     public record QueryAnswerPayload(FriendlyByteBuf buffer) implements CustomQueryAnswerPayload {
         @Override
-        public void write(final FriendlyByteBuf buf) {
+        public void write(final @NotNull FriendlyByteBuf buf) {
         }
 
     }
 
     public record VersionPayload(byte version) implements CustomQueryPayload {
-
-        public static final ResourceLocation id = PLAYER_INFO_CHANNEL;
+        //? if >=1.21.11 {
+        public static final net.minecraft.resources.Identifier id = PLAYER_INFO_CHANNEL;
+        //?} else {
+        //public static final net.minecraft.resources.ResourceLocation id = PLAYER_INFO_CHANNEL;
+        //?}
 
         @Override
         public void write(final FriendlyByteBuf buf) {
             buf.writeByte(this.version);
         }
 
+        //? if >=1.21.11 {
         @Override
-        public @NotNull ResourceLocation id() {
+        public @NotNull net.minecraft.resources.Identifier id() {
             return id;
         }
+        //?} else {
+        //@Override
+        //public @NotNull net.minecraft.resources.ResourceLocation id() {return id;}
+        //?}
     }
 }

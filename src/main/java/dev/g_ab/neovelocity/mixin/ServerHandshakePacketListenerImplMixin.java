@@ -1,5 +1,6 @@
 package dev.g_ab.neovelocity.mixin;
 
+import dev.g_ab.neovelocity.NeoVelocity;
 import dev.g_ab.neovelocity.VelocityLoginPacketListenerImpl;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.Connection;
@@ -26,18 +27,28 @@ public class ServerHandshakePacketListenerImplMixin {
 
     /**
      * @author GabWasnt
-     * @reason inject the Velocity proxy handler
+     * @reason Inject the Velocity proxy handler
      */
     @Overwrite
     public void beginLogin(ClientIntentionPacket packet, boolean transferred) {
         this.connection.setupOutboundProtocol(LoginProtocols.CLIENTBOUND);
-        if (packet.protocolVersion() != SharedConstants.getCurrentVersion().getProtocolVersion()) {
-            Component component;
-            if (packet.protocolVersion() < 754) {
-                component = Component.translatable("multiplayer.disconnect.outdated_client", SharedConstants.getCurrentVersion().getName());
-            } else {
-                component = Component.translatable("multiplayer.disconnect.incompatible", SharedConstants.getCurrentVersion().getName());
-            }
+        int serverProtocol;
+        String serverVersion;
+
+        //? if >=1.21.9 {
+        serverProtocol = SharedConstants.getCurrentVersion().protocolVersion();
+        serverVersion = SharedConstants.getCurrentVersion().name();
+        //?} else {
+        /*serverProtocol = SharedConstants.getCurrentVersion().getProtocolVersion();
+        serverVersion = SharedConstants.getCurrentVersion().getName();*/
+        //?}
+
+        if (packet.protocolVersion() != serverProtocol) {
+            String key = (packet.protocolVersion() < 754)
+                ? "multiplayer.disconnect.outdated_client"
+                : "multiplayer.disconnect.incompatible";
+
+            Component component = Component.translatable(key, serverVersion);
 
             this.connection.send(new ClientboundLoginDisconnectPacket(component));
             this.connection.disconnect(component);

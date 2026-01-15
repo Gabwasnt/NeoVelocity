@@ -8,6 +8,7 @@ bin
 
 # idea
 out
+.idea/
 *.ipr
 *.iws
 *.iml
@@ -16,11 +17,11 @@ out
 # gradle
 build
 .gradle
+versions/*/build/
+versions/*/.gradle/
 
 # other
 eclipse
 run
-runs
-run-data
 
 repo

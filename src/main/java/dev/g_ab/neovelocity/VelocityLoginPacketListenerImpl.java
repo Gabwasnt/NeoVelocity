@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.login.ClientboundCustomQueryPacket;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.util.StringUtil;
@@ -21,6 +20,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerImpl {
@@ -40,19 +40,30 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
 
     @Override
     public void handleCustomQueryPacket(@NotNull ServerboundCustomQueryAnswerPacket packet) {
+        // 1. Check for valid local configuration
         if (!NeoVelocityConfig.COMMON.secretValid) {
-            this.disconnect(Component.literal("Invalid server secret configuration."));
-            NeoVelocity.getLogger().warn("Invalid secret; failing integrity check.");
+            this.disconnect(Component.literal("NeoVelocity configuration error. Check server logs."));
+            NeoVelocity.getLogger().error("Login rejected: The forwarding secret has not been configured in 'config/neovelocity-common.toml'.");
             return;
         }
+
         if (velocityLoginMessageId > 0 && packet.transactionId() == velocityLoginMessageId) {
-            if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload(FriendlyByteBuf buffer)) {
+            // 2. Check for Packet Loop-back (Empty Payload)
+            // This happens if:
+            // A. The player connected directly (bypassing Velocity).
+            // B. The player connected via Velocity, but Velocity is set to 'player-info-forwarding-mode = "none"' or "legacy".
+            if (packet.payload() == null) {
+                this.disconnect(Component.literal("This server requires you to connect via a Velocity Proxy using Modern Forwarding."));
+                NeoVelocity.getLogger().warn("Connection rejected from {}: Received empty forwarding payload.", this.connection.getRemoteAddress());
+            } else if (packet.payload() instanceof VelocityProxy.QueryAnswerPayload(FriendlyByteBuf buffer)) {
+                // 3. Check Integrity (HMAC Signature)
                 if (!VelocityProxy.checkIntegrity(buffer)) {
-                    this.disconnect(Component.literal("Unable to verify player details."));
-                    NeoVelocity.getLogger().warn("Integrity check failed for {} (Invalid secret)", this.connection.getRemoteAddress());
+                    this.disconnect(Component.literal("Unable to verify proxy data integrity. Check server logs."));
+                    NeoVelocity.getLogger().error("Integrity check failed for {}. The forwarding secret in 'neovelocity-common.toml' likely does not match the secret in the Velocity Proxy configuration.", this.connection.getRemoteAddress());
                     return;
                 }
 
+                // 4. Version Compatibility
                 int version = buffer.readVarInt();
                 if (version > VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION) {
                     this.disconnect(Component.literal(String.format("Unsupported forwarding version %d, supported up to %d", version, VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION)));
@@ -72,17 +83,25 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
 
                 this.authenticatedProfile = VelocityProxy.createProfile(buffer);
                 this.state = ServerLoginPacketListenerImpl.State.VERIFYING;
+                String name;
+                UUID id;
+                //? if >=1.21.9 {
+                name = this.authenticatedProfile.name();
+                id = this.authenticatedProfile.id();
+                //?} else {
+                //name = this.authenticatedProfile.getName();
+                //id = this.authenticatedProfile.getId();
+                //?}
 
-                NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", this.authenticatedProfile.getName(), this.authenticatedProfile.getId());
+                NeoVelocity.getLogger().info("Authenticated {} ({}) via Velocity proxy", name, id);
             } else {
-                StringBuilder modDump = new StringBuilder("Mod List:\n\tName Version (Mod Id)");
-                ModList.get().getMods().forEach(mod -> modDump.append("\n\t").append(mod.getDisplayName()).append(" ").append(mod.getVersion().toString()).append(" (").append(mod.getModId()).append(")"));
+                // 5. Catch-All / Unknown Payload / Mod Interference
+                this.disconnect(Component.literal("Incompatible mod detected during login handshake. Check server logs."));
+
                 if (NeoVelocityConfig.COMMON.LOGIN_CUSTOM_PACKET_CATCHALL.get()) {
-                    this.disconnect(Component.literal("Incompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
-                    NeoVelocity.getLogger().error("Velocity authentication packets were modified unexpectedly. This is likely caused by an incompatible mod interfering with the login process. Please report this issue at https://github.com/Gabwasnt/NeoVelocity and include the following:\n{}", modDump);
+                    NeoVelocity.getLogger().error("Login failed: The Velocity authentication packet was modified unexpectedly.");
                 } else {
-                    this.disconnect(Component.literal("Unable to verify player details.\nor\nIncompatible mod detected during login.\nThis is a server-side issue. Please contact an administrator."));
-                    NeoVelocity.getLogger().error("Integrity check failed for {} (Invalid secret) or Velocity authentication packets were modified unexpectedly. This is likely caused by an incompatible mod interfering with the login process. Please report this issue at https://github.com/Gabwasnt/NeoVelocity and include the following:\n{}", this.connection.getRemoteAddress(), modDump);
+                    NeoVelocity.getLogger().error("Login failed: Integrity check failed OR the packet was modified unexpectedly.");
                 }
             }
         } else super.handleCustomQueryPacket(packet);
@@ -97,12 +116,16 @@ public class VelocityLoginPacketListenerImpl extends ServerLoginPacketListenerIm
             Class<?> addonClass = Class.forName("net.fabricmc.fabric.impl.networking.server.ServerLoginNetworkAddon");
             Field channelsField = addonClass.getDeclaredField("channels");
             channelsField.setAccessible(true);
+            //? if >=1.21.11 {
+            @SuppressWarnings("unchecked") Map<Integer, net.minecraft.resources.Identifier> channels = (Map<Integer, net.minecraft.resources.Identifier>) channelsField.get(addon);
+            //?} else {
+            //@SuppressWarnings("unchecked") Map<Integer, net.minecraft.resources.ResourceLocation> channels = (Map<Integer, net.minecraft.resources.ResourceLocation>) channelsField.get(addon);
+            //?}
 
-            @SuppressWarnings("unchecked") Map<Integer, ResourceLocation> channels = (Map<Integer, ResourceLocation>) channelsField.get(addon);
             channels.remove(velocityLoginMessageId);
         } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException |
                  InvocationTargetException e) {
-            this.disconnect(Component.literal("Server encountered an error applying the Fabric Networking API workaround.\nThis is a server-side issue. Please contact an administrator."));
+            this.disconnect(Component.literal("Internal server error during login (Fabric Networking API)."));
             NeoVelocity.getLogger().error("Server-side compatibility workaround for Fabric Networking API v1 failed.", e);
         }
     }

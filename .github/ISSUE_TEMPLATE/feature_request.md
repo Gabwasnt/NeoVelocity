@@ -1,20 +1,23 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Feature Request
+about: Suggest an idea or improvement for NeoVelocity
 title: ''
-labels: enhancement, triage
+labels: enhancement, unverified
 assignees: ''
-
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+### The Problem
+<!-- Is your feature request related to a specific frustration? Please describe it here. -->
+<!-- Ex. "I cannot use NeoVelocity with [Specific Plugin] because..." -->
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+### Proposed Solution
+<!-- Describe the solution you'd like to see implemented. -->
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+
+### Alternatives Considered
+<!-- Have you considered any alternative solutions or workarounds? -->
+
+
+### Additional Context
+<!-- Add any other context, screenshots, or links about the feature request here. -->
