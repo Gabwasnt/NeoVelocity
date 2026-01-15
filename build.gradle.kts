@@ -128,9 +128,10 @@ tasks {
         dependsOn("build")
     }
 
+    val hasTargets = (findProperty("publish.targets") as? String)?.split(' ')?.isNotEmpty()?: false
     named("publishMods") {
         onlyIf {
-            (findProperty("publish.targets") as? String)?.split(' ')?.isNotEmpty() ?: false
+            hasTargets
         }
     }
 }

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/Gabwasnt/NeoVelocity/compare/dev...HEAD)
 
-## [1.2.5](https://github.com/Gabwasnt/NeoVelocity/compare/v1.2.4...v1.2.5) - 2026-01-15
+## [1.2.6](https://github.com/Gabwasnt/NeoVelocity/compare/v1.2.4...v1.2.5) - 2026-01-15
 
 + Added support for 1.21.6, 1.21.7 and 1.21.8
 
